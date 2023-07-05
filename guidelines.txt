@@ -1,0 +1,48 @@
+Unit Testing Guidelines:
+
+1. Incoming Messages:
+Incoming query (e.g., user input or API call):
+    • Test by asserting the expected output or response.
+Incoming command (e.g., modifying data or triggering actions):
+    • Test by asserting the direct public side effects caused by the command.
+
+2. Internal Messages:
+Sent to self query (e.g., obtaining internal information):
+    • Ignore
+Sent to self command (e.g., internal actions with side effects):
+    • Ignore
+
+3. Outgoing Messages:
+Outgoing query (e.g., retrieving information from external dependencies):
+    • Ignore
+Outgoing command (e.g., causing side effects in external dependencies):
+    • Expect to send outgoing command messages (break the rule if side effects are 
+      stable and cheap).
+
+
+Other things to keep in mind:
+
+2 solutions for tightly coupled code:
+1. Pure functions (remove dependencies) ← Use always where possible 
+2. Mocking (fake version) ← Use if #1 is not possible
+
+How to write the tests first:
+Think in terms of examples: “How will this function be called in my future code?” 
+
+
+Workflow best practices:
+    1. Define the test case (or cases): Begin by writing a test case that 
+       describes the desired behavior of a specific function or module. 
+       Think about the different scenarios and edge cases you want to cover.
+    2. Write the test (or tests): Implement the test case using the 
+       Jest testing library. Define the inputs for the function/module being 
+       tested and assert the expected outputs or behavior.
+    3. Run the test (or tests): Execute the test using the testing framework 
+       (e.g., Jest). At this stage, the test will most likely fail since the 
+       implementation of the function/module doesn't exist yet or is incomplete.
+    4. Build the function/module (or functions/modules): Start implementing the 
+       function/module based on the test case you wrote. Focus on making the test 
+       pass by writing the necessary code.
+    5. Refactor and iterate: Once the test case (or cases)  passes, you can 
+       refactor the code if needed and move on to the next test case. Repeat steps 1-5 for 
+       each function/module you want to test.
