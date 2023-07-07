@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    main: ["./src/app.js", "./src/app-logic.js"],
+    main: ["./src/app.js", "./src/factories.js"],
   },
   devtool: "inline-source-map",
   output: {
