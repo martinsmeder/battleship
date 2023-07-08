@@ -45,11 +45,18 @@ export const GameboardFactory = () => {
     );
 
     if (withinBoundaries && !conflicts) {
-      convertedCoordinates.forEach(([row, col]) => {
-        grid[row][col] = ship;
+      const shipInfo = {
+        ship,
+        coordinates: convertedCoordinates,
+      };
+
+      shipInfo.coordinates.forEach(([row, col]) => {
+        grid[row][col] = shipInfo;
       });
+
       return true; // Ship placement successful
     }
+
     return false; // Ship placement failed
   };
 
@@ -59,8 +66,13 @@ export const GameboardFactory = () => {
     for (let row = 0; row < gridSize; row += 1) {
       for (let col = 0; col < gridSize; col += 1) {
         const cell = grid[row][col];
-        if (cell !== null && !ships.includes(cell) && !cell.isSunk()) {
-          ships.push(cell);
+        if (
+          cell !== null &&
+          cell.ship &&
+          !ships.includes(cell.ship) &&
+          !cell.ship.isSunk()
+        ) {
+          ships.push(cell.ship);
         }
       }
     }
@@ -73,7 +85,8 @@ export const GameboardFactory = () => {
 
     for (let row = 0; row < gridSize; row += 1) {
       for (let col = 0; col < gridSize; col += 1) {
-        if (grid[row][col] === ship) {
+        const cell = grid[row][col];
+        if (cell && cell.ship === ship) {
           coordinates.push(FactoryUtils.convertToAlphanumeric([row, col]));
         }
       }
@@ -86,15 +99,12 @@ export const GameboardFactory = () => {
     const [row, col] = FactoryUtils.convertToIndices(coordinate);
     const cell = grid[row][col];
 
-    console.log("cell.hits:", cell.hits);
+    const ship = cell && cell.ship; // Access the ship property of the cell object
 
-    if (cell instanceof ShipFactory) {
-      cell.hit(); // Increment hit count of the ship
-      console.log("ship:", cell);
-      console.log("ship.hits:", cell.hits);
+    if (ship) {
+      ship.hit(); // Increment hit count of the ship
     } else {
-      // Record missed attack coordinates
-      missedAttacks.push(coordinate);
+      missedAttacks.push(coordinate); // Record missed attack coordinates
     }
   };
 

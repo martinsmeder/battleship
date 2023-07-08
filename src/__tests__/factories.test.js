@@ -78,9 +78,6 @@ describe("GameboardFactory", () => {
     gameboard.receiveAttack("A1");
     gameboard.receiveAttack("A2");
 
-    console.log("ship:", ship);
-    console.log("ship.hits:", ship.hits);
-
     expect(ship.hits).toBe(2);
   });
 
