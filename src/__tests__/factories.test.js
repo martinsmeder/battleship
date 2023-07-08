@@ -1,5 +1,6 @@
 /* global describe, it, expect, beforeEach */
 
+import FactoryHelpers from "../utils";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "../factories";
 
 // ========================================= ShipFactory =====================================
@@ -44,8 +45,8 @@ describe("GameboardFactory", () => {
 
   it("should create a grid with a size of 10x10", () => {
     const grid = gameboard.getGrid();
-    expect(grid.length).toBe(10); // Check number of rows
-    expect(grid.every((row) => row.length === 10)).toBe(true); // Check number of columns per row
+    expect(grid.length).toBe(10);
+    expect(grid.every((row) => row.length === 10)).toBe(true);
   });
 
   it("should place a ship at specific coordinates", () => {
@@ -54,10 +55,10 @@ describe("GameboardFactory", () => {
 
     gameboard.placeShip(ship, coordinates);
 
-    const ships = gameboard.getShips(); // Retrieve the ships from the gameboard
+    const ships = gameboard.getShips();
 
     expect(ships).toContain(ship);
-    expect(gameboard.getShipCoordinates(ships[0])).toEqual(coordinates); // Use the ship from the ships array for retrieving coordinates
+    expect(gameboard.getShipCoordinates(ships[0])).toEqual(coordinates);
   });
 
   it("should throw an error when placing a ship at overlapping coordinates", () => {
@@ -174,14 +175,29 @@ describe("PlayerFactory", () => {
       enemyGameboard = GameboardFactory();
     });
 
-    it("should perform an attack on the enemy Gameboard", () => {
+    it("should increase missedAttacks length when missing a target", () => {
+      const initialMissedAttacks = enemyGameboard.getMissedAttacks().length;
+
+      player.attack(enemyGameboard);
+
+      const updatedMissedAttacks = enemyGameboard.getMissedAttacks().length;
+
+      expect(updatedMissedAttacks).toBeGreaterThan(initialMissedAttacks);
+    });
+
+    it("should increase the ship's hit counts when hitting a target", () => {
       const ship = ShipFactory(3);
       const coordinates = ["A1", "A2", "A3"];
       enemyGameboard.placeShip(ship, coordinates);
 
       const initialHits = ship.hits;
 
-      player.attack(enemyGameboard);
+      const gridSize = enemyGameboard.getGrid().length;
+      for (let row = 0; row < gridSize; row += 1) {
+        for (let col = 0; col < gridSize; col += 1) {
+          player.attack(enemyGameboard);
+        }
+      }
 
       const updatedHits = ship.hits;
 
@@ -194,17 +210,24 @@ describe("PlayerFactory", () => {
       enemyGameboard.placeShip(ship, coordinates);
 
       const attackedCoordinates = new Set();
+      const gridSize = enemyGameboard.getGrid().length;
 
-      for (let i = 0; i < 10; i += 1) {
-        player.attack(enemyGameboard);
+      for (let row = 0; row < gridSize; row += 1) {
+        for (let col = 0; col < gridSize; col += 1) {
+          player.attack(enemyGameboard);
 
-        const attackedCoordinate =
-          enemyGameboard.getMissedAttacks().pop() || "";
-        const isUniqueCoordinate = !attackedCoordinates.has(attackedCoordinate);
+          // Get the most recent attacked coordinate
+          const attackedCoordinate =
+            enemyGameboard.getAttackedCoordinates().pop() || "";
 
-        expect(isUniqueCoordinate).toBe(true);
+          // Check if the attacked coordinate is unique
+          const isUniqueCoordinate =
+            !attackedCoordinates.has(attackedCoordinate);
 
-        attackedCoordinates.add(attackedCoordinate);
+          expect(isUniqueCoordinate).toBe(true);
+
+          attackedCoordinates.add(attackedCoordinate);
+        }
       }
     });
 
@@ -213,18 +236,30 @@ describe("PlayerFactory", () => {
       const coordinates = ["A1", "A2", "A3"];
       enemyGameboard.placeShip(ship, coordinates);
 
-      for (let i = 0; i < 10; i += 1) {
-        player.attack(enemyGameboard);
+      const gridSize = enemyGameboard.getGrid().length;
+      const validCoordinates = FactoryHelpers.getAllValidCoordinates(gridSize);
 
-        const attackedCoordinate =
-          enemyGameboard.getMissedAttacks().pop() || "";
-        const isValidCoordinate =
-          attackedCoordinate.length === 2 &&
-          attackedCoordinate[0].match(/[A-J]/) &&
-          attackedCoordinate[1].match(/[1-9]|10/);
+      const attackedCoordinates = new Set();
 
-        expect(isValidCoordinate).toBe(true);
+      for (let row = 0; row < gridSize; row += 1) {
+        for (let col = 0; col < gridSize; col += 1) {
+          player.attack(enemyGameboard);
+
+          // Get the most recent attacked coordinate
+          const attackedCoordinate =
+            enemyGameboard.getAttackedCoordinates().pop() || "";
+
+          attackedCoordinates.add(attackedCoordinate);
+        }
       }
+
+      // Check if all attacked coordinates are valid by verifying if each coordinate
+      // is included in the validCoordinates array
+      const allAttacksValid = Array.from(attackedCoordinates).every(
+        (coordinate) => validCoordinates.includes(coordinate)
+      );
+
+      expect(allAttacksValid).toBe(true);
     });
   });
 });

@@ -1,4 +1,4 @@
-import FactoryUtils from "./utils";
+import FactoryHelpers from "./utils";
 
 // 2. Get PlayerFactory to pass tests
 // 3. Go through testing guidelines and add comments describing each test
@@ -34,6 +34,7 @@ export const GameboardFactory = () => {
     Array(gridSize).fill(null)
   );
 
+  const attackedCoordinates = [];
   const missedAttacks = [];
 
   const getGrid = () => grid;
@@ -41,7 +42,7 @@ export const GameboardFactory = () => {
   const placeShip = (ship, coordinates) => {
     // Convert alphanumeric to grid indices
     const convertedCoordinates = coordinates.map((coord) =>
-      FactoryUtils.convertToIndices(coord)
+      FactoryHelpers.convertToIndices(coord)
     );
 
     // Check if all converted coordinates are within the boundaries of the grid
@@ -107,7 +108,7 @@ export const GameboardFactory = () => {
         if (cell && cell.ship === ship) {
           // Convert the row and column indices to alphanumeric coordinates and add them to
           // the coordinates array
-          coordinates.push(FactoryUtils.convertToAlphanumeric([row, col]));
+          coordinates.push(FactoryHelpers.convertToAlphanumeric([row, col]));
         }
       }
     }
@@ -116,7 +117,7 @@ export const GameboardFactory = () => {
   };
 
   const receiveAttack = (coordinate) => {
-    const [row, col] = FactoryUtils.convertToIndices(coordinate);
+    const [row, col] = FactoryHelpers.convertToIndices(coordinate);
     const cell = grid[row][col];
 
     const ship = cell && cell.ship; // Access the ship property of the cell object
@@ -126,9 +127,13 @@ export const GameboardFactory = () => {
     } else {
       missedAttacks.push(coordinate); // Record missed attack coordinates
     }
+
+    attackedCoordinates.push(coordinate);
   };
 
   const getMissedAttacks = () => missedAttacks;
+
+  const getAttackedCoordinates = () => attackedCoordinates;
 
   const allShipsSunk = () => {
     const ships = getShips(); // Retrieve all the ships on the gameboard
@@ -137,7 +142,6 @@ export const GameboardFactory = () => {
     return ships.every((ship) => ship.isSunk());
   };
 
-  // Return the public interface of the GameboardFactory
   return {
     getGrid,
     placeShip,
@@ -145,13 +149,40 @@ export const GameboardFactory = () => {
     getShipCoordinates,
     receiveAttack,
     getMissedAttacks,
+    getAttackedCoordinates,
     allShipsSunk,
   };
 };
 
 export const PlayerFactory = (name) => {
-  const attack = () => {
-    // ...
+  const attackedCoordinates = new Set(); // Set to keep track of attacked coordinates
+
+  const attack = (enemyGameboard) => {
+    const gridSize = enemyGameboard.getGrid().length;
+    const validCoordinates = FactoryHelpers.getAllValidCoordinates(gridSize);
+
+    let coordinate = "";
+
+    // Perform a do-while loop until a unique coordinate is found
+    do {
+      // Generate a random index based on the length of validCoordinates array
+      const randomIndex = Math.floor(Math.random() * validCoordinates.length);
+
+      // Get the coordinate at the random index
+      coordinate = validCoordinates[randomIndex];
+    } while (
+      // Continue looping without performing any actions if the coordinate is already
+      // in the players attackedCoordinates set or is included in the enemyGameboards
+      // attackedCoordinates array
+      attackedCoordinates.has(coordinate) ||
+      enemyGameboard.getAttackedCoordinates().includes(coordinate)
+    );
+
+    // Add the attacked coordinate to the players set of attacked coordinates
+    attackedCoordinates.add(coordinate);
+
+    // Perform the attack on the enemy gameboard
+    enemyGameboard.receiveAttack(coordinate);
   };
 
   return {
