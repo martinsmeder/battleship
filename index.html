@@ -8,6 +8,32 @@
     <script src="main.js" defer></script>
 </head>
 <body>
+    <div id="container">
+        <header>BATTLESHIP</header>
+
+        <main>
+            <div id="gameboardContainer">GAMEBOARD</div>
+        </main>
     
+        <footer>
+            <a href="https://github.com/martinsmeder" target="_blank">Coded by: Martin Smeder</a>
+        </footer>
+    </div>
+
+    <div class="overlay">
+        <div class="modal initial">
+            <h3>Ready to play battleship?</h3>
+            <p>Place your...</p>
+            <button>Rotate</button>
+            <div class="gameboard"></div>
+        </div>
+    </div>
+
+    <div class="overlay">
+        <div class="modal endgame">
+            <h3>... won!</h3>
+            <button>Play Again</button>
+        </div>
+    </div>
 </body>
 </html>
