@@ -1,9 +1,4 @@
-import FactoryHelpers from "./utils";
-
-// 2. Get PlayerFactory to pass tests
-// 3. Go through testing guidelines and add comments describing each test
-//    "incoming query: asserting ...", and remove those that are not needed
-//    bases on the guidelines "sent to self query: ignore test"
+import { FactoryHelpers } from "./utils";
 
 export const ShipFactory = (length) => {
   let hits = 0;

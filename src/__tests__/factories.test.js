@@ -9,24 +9,29 @@ describe("ShipFactory", () => {
   const ship = ShipFactory(3);
 
   it("should create a ship object with the correct length", () => {
+    // Incoming query - Assert the expected output
     expect(ship.length).toBe(3);
   });
 
   it("should create a ship object with initial hits count of 0", () => {
+    // Incoming query - Assert the expected output
     expect(ship.hits).toBe(0);
   });
 
   it("s hit() method should increase the hits count", () => {
+    // Incoming command - Assert the direct public side effect
     ship.hit();
     expect(ship.hits).toBe(1);
   });
 
   it("s isSunk() method should return false when hits count is less than length", () => {
+    // Incoming query - Assert the expected output
     ship.hit();
     expect(ship.isSunk()).toBe(false);
   });
 
   it("s isSunk() method should return true when hits count equals length", () => {
+    // Incoming query - Assert the expected output
     ship.hit();
     ship.hit();
     ship.hit();
@@ -44,12 +49,14 @@ describe("GameboardFactory", () => {
   });
 
   it("should create a grid with a size of 10x10", () => {
+    // Incoming command - Assert the direct public side effects
     const grid = gameboard.getGrid();
     expect(grid.length).toBe(10);
     expect(grid.every((row) => row.length === 10)).toBe(true);
   });
 
   it("should place a ship at specific coordinates", () => {
+    // Incoming command - Assert the direct public side effects
     const ship = ShipFactory(3);
     const coordinates = ["A1", "A2", "A3"];
 
@@ -61,7 +68,8 @@ describe("GameboardFactory", () => {
     expect(gameboard.getShipCoordinates(ships[0])).toEqual(coordinates);
   });
 
-  it("should throw an error when placing a ship at overlapping coordinates", () => {
+  it("should return false when placing a ship at overlapping coordinates", () => {
+    // Incoming command - Assert the direct public side effect
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
     const coordinates1 = ["A1", "A2", "A3"];
@@ -75,6 +83,7 @@ describe("GameboardFactory", () => {
   });
 
   it("should correctly handle receiving an attack on a ship", () => {
+    // Incoming command - Assert the direct public side effect
     const ship = ShipFactory(3);
     const coordinates = ["A1", "A2", "A3"];
 
@@ -87,6 +96,7 @@ describe("GameboardFactory", () => {
   });
 
   it("should correctly handle receiving a missed attack", () => {
+    // Incoming command - Assert the direct public side effect
     gameboard.receiveAttack("A1");
     gameboard.receiveAttack("B2");
     gameboard.receiveAttack("C3");
@@ -95,6 +105,7 @@ describe("GameboardFactory", () => {
   });
 
   it("should record all missed attacks", () => {
+    // Incoming command - Assert the direct public side effect
     const missedCoordinates = ["A1", "B2", "C3"];
 
     missedCoordinates.forEach((coord) => {
@@ -105,6 +116,7 @@ describe("GameboardFactory", () => {
   });
 
   it("should correctly determine if all ships have been sunk", () => {
+    // Incoming query - Assert the expected output
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
     const ship3 = ShipFactory(4);
@@ -130,6 +142,7 @@ describe("GameboardFactory", () => {
   });
 
   it("should correctly determine if not all ships have been sunk", () => {
+    // Incoming query - Assert the expected output
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
     const ship3 = ShipFactory(4);
@@ -161,10 +174,12 @@ describe("PlayerFactory", () => {
   });
 
   it("should create a player object with the given name", () => {
+    // Incoming query - Assert the expected output
     expect(player.name).toBe("Computer");
   });
 
   it("should have an attack method", () => {
+    // Incoming query - Assert the presence of the attack method
     expect(typeof player.attack).toBe("function");
   });
 
@@ -176,6 +191,7 @@ describe("PlayerFactory", () => {
     });
 
     it("should increase missedAttacks length when missing a target", () => {
+      // Incoming command - Assert the direct public side effect
       const initialMissedAttacks = enemyGameboard.getMissedAttacks().length;
 
       player.attack(enemyGameboard);
@@ -185,7 +201,8 @@ describe("PlayerFactory", () => {
       expect(updatedMissedAttacks).toBeGreaterThan(initialMissedAttacks);
     });
 
-    it("should increase the ship's hit counts when hitting a target", () => {
+    it("should increase the ship's hit count when hitting a target", () => {
+      // Incoming command - Assert the direct public side effect
       const ship = ShipFactory(3);
       const coordinates = ["A1", "A2", "A3"];
       enemyGameboard.placeShip(ship, coordinates);
@@ -205,10 +222,7 @@ describe("PlayerFactory", () => {
     });
 
     it("should not attack the same coordinate twice", () => {
-      const ship = ShipFactory(3);
-      const coordinates = ["A1", "A2", "A3"];
-      enemyGameboard.placeShip(ship, coordinates);
-
+      // Incoming command - Assert the direct public side effect
       const attackedCoordinates = new Set();
       const gridSize = enemyGameboard.getGrid().length;
 
@@ -232,10 +246,7 @@ describe("PlayerFactory", () => {
     });
 
     it("should only attack valid coordinates within the enemy Gameboard", () => {
-      const ship = ShipFactory(3);
-      const coordinates = ["A1", "A2", "A3"];
-      enemyGameboard.placeShip(ship, coordinates);
-
+      // Incoming command - Assert the direct public side effect
       const gridSize = enemyGameboard.getGrid().length;
       const validCoordinates = FactoryHelpers.getAllValidCoordinates(gridSize);
 

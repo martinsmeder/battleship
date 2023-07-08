@@ -1,4 +1,4 @@
-const FactoryHelpers = (() => {
+export const FactoryHelpers = (() => {
   const validCoordinates = [];
 
   const convertToIndices = (coordinate) => {
@@ -33,4 +33,18 @@ const FactoryHelpers = (() => {
   };
 })();
 
-export default FactoryHelpers;
+export const AppHelpers = (() => {
+  const toggleModal = (modal, choice) => {
+    const toggledModal = modal;
+
+    const overlay = modal.closest(".overlay");
+    const displayValue = choice === "show" ? "flex" : "none";
+
+    overlay.style.display = displayValue;
+    toggledModal.style.display = displayValue;
+  };
+
+  return {
+    toggleModal,
+  };
+})();

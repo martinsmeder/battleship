@@ -1,10 +1,10 @@
 Unit Testing Guidelines:
 
 1. Incoming Messages:
-Incoming query (e.g., user input or API call):
+Incoming query (e.g., obtaining information or expected output):
     • Test by asserting the expected output or response.
-Incoming command (e.g., modifying data or triggering actions):
-    • Test by asserting the direct public side effects caused by the command.
+Incoming command (e.g., modifying data/changing state or triggering actions):
+    • Test by asserting the direct public side effects or changes in state caused by command.
 
 2. Internal Messages:
 Sent to self query (e.g., obtaining internal information):
