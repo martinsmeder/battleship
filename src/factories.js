@@ -34,22 +34,30 @@ export const GameboardFactory = () => {
   const getGrid = () => grid;
 
   const placeShip = (ship, coordinates) => {
+    // Convert alphanumeric to grid indices
     const convertedCoordinates = coordinates.map((coord) =>
       FactoryUtils.convertToIndices(coord)
     );
+
+    // Check if all converted coordinates are within the boundaries of the grid
     const withinBoundaries = convertedCoordinates.every(
       ([row, col]) => row >= 0 && row < gridSize && col >= 0 && col < gridSize
     );
+
+    // Check if there are any conflicts with existing ship placements on the grid
     const conflicts = convertedCoordinates.some(
       ([row, col]) => grid[row][col] !== null
     );
 
+    // If the ship placement is within boundaries and has no conflicts...
     if (withinBoundaries && !conflicts) {
+      // Create an object containing ship information and converted coordinates
       const shipInfo = {
         ship,
         coordinates: convertedCoordinates,
       };
 
+      // Place the ship on the grid by updating the corresponding cells
       shipInfo.coordinates.forEach(([row, col]) => {
         grid[row][col] = shipInfo;
       });
@@ -57,21 +65,24 @@ export const GameboardFactory = () => {
       return true; // Ship placement successful
     }
 
-    return false; // Ship placement failed
+    return false; // Otherwise, ship placement failed
   };
 
   const getShips = () => {
     const ships = [];
 
+    // Iterate through each cell of the grid
     for (let row = 0; row < gridSize; row += 1) {
       for (let col = 0; col < gridSize; col += 1) {
         const cell = grid[row][col];
+        // Check if the cell contains a ship and it's not already included in the ships array
         if (
           cell !== null &&
           cell.ship &&
           !ships.includes(cell.ship) &&
           !cell.ship.isSunk()
         ) {
+          // Add the ship to the ships array
           ships.push(cell.ship);
         }
       }
@@ -83,10 +94,14 @@ export const GameboardFactory = () => {
   const getShipCoordinates = (ship) => {
     const coordinates = [];
 
+    // Iterate through each cell of the grid
     for (let row = 0; row < gridSize; row += 1) {
       for (let col = 0; col < gridSize; col += 1) {
         const cell = grid[row][col];
+        // Check if the cell exists and contains the specified ship
         if (cell && cell.ship === ship) {
+          // Convert the row and column indices to alphanumeric coordinates and add them to
+          // the coordinates array
           coordinates.push(FactoryUtils.convertToAlphanumeric([row, col]));
         }
       }
