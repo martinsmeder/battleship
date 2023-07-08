@@ -1,5 +1,10 @@
 import FactoryUtils from "./utils";
 
+// 2. Get PlayerFactory to pass tests
+// 3. Go through testing guidelines and add comments describing each test
+//    "incoming query: asserting ...", and remove those that are not needed
+//    bases on the guidelines "sent to self query: ignore test"
+
 export const ShipFactory = (length) => {
   let hits = 0;
 
@@ -123,15 +128,13 @@ export const GameboardFactory = () => {
     }
   };
 
-  // Function to get the coordinates of missed attacks on the gameboard
-  const getMissedAttacks = () => {
-    // Return an array of coordinates representing missed attacks on the gameboard
-  };
+  const getMissedAttacks = () => missedAttacks;
 
-  // Function to determine if all ships on the gameboard have been sunk
   const allShipsSunk = () => {
-    // Check if all ships on the gameboard have been sunk
-    // Return true if all ships are sunk, false otherwise
+    const ships = getShips(); // Retrieve all the ships on the gameboard
+
+    // Check if all ships are sunk, return true if yes, and return false if no
+    return ships.every((ship) => ship.isSunk());
   };
 
   // Return the public interface of the GameboardFactory
@@ -143,5 +146,16 @@ export const GameboardFactory = () => {
     receiveAttack,
     getMissedAttacks,
     allShipsSunk,
+  };
+};
+
+export const PlayerFactory = (name) => {
+  const attack = () => {
+    // ...
+  };
+
+  return {
+    name,
+    attack,
   };
 };
