@@ -1,4 +1,5 @@
 import { AppHelpers } from "./utils";
+import Renderer from "./render";
 
 // This module can handle the game loop and coordinate the overall flow of
 // the game. It can create instances of players and gameboards, manage turns,
@@ -14,16 +15,32 @@ import { AppHelpers } from "./utils";
 // corresponding actions and UI updates.
 
 // 1. ---
-// 2. Render grid
-// 3. Add event listeners to each cell
+// 2. ---
+// 3. ---
 // 4. Make "place your..." responsive
 // 5. Implement drag and drop for each ship type
 // 6. Implement rotate button
 // 7. Hide initial modal when all ships are placed
 
 const Controller = (() => {
+  const shipHoverHandler = (e) => {
+    const square = e.target;
+    square.classList.add("hovered");
+  };
+
+  const shipPlacementHandler = (e) => {
+    const square = e.target;
+    square.classList.add("placed");
+  };
+
+  const eventListeners = [
+    { eventType: "mouseover", handler: shipHoverHandler },
+    { eventType: "click", handler: shipPlacementHandler },
+  ];
+
   const init = () => {
     AppHelpers.toggleModal(document.querySelector(".modal.endgame"), "hide");
+    Renderer.renderGameboard(".gameboard.initial", eventListeners);
   };
 
   return {
