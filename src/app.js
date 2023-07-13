@@ -1,5 +1,6 @@
 import { AppHelpers } from "./utils";
 import Renderer from "./render";
+import { ShipFactory, GameboardFactory } from "./factories";
 
 // This module can handle the game loop and coordinate the overall flow of
 // the game. It can create instances of players and gameboards, manage turns,
@@ -17,24 +18,130 @@ import Renderer from "./render";
 // 1. ---
 // 2. ---
 // 3. ---
-// 4. Make "place your..." responsive
+// 4. ---
 // 5. Implement drag and drop for each ship type
 // 6. Implement rotate button
 // 7. Hide initial modal when all ships are placed
 
 const Controller = (() => {
-  const shipHoverHandler = (e) => {
-    const square = e.target;
-    square.classList.add("hovered");
-  };
+  // const shipHoverHandler = (e) => {
+  //   if (shipPlacementMode) {
+  //     const square = e.target;
+  //     const startRow = parseInt(square.dataset.row, 10);
+  //     const startCol = parseInt(square.dataset.col, 10);
+  //     const shipLength = ShipFactory(shipTypes[currentShipIndex]).length;
+
+  //     const hoveredSquares = [];
+  //     for (let i = 0; i < shipLength; i++) {
+  //       const row = startRow;
+  //       const col = startCol + i;
+  //       const hoveredSquare = document.querySelector(
+  //         `[data-row="${row}"][data-col="${col}"]`
+  //       );
+  //       hoveredSquares.push(hoveredSquare);
+  //     }
+
+  //     hoveredSquares.forEach((hoveredSquare) => {
+  //       hoveredSquare.classList.add("hovered");
+  //     });
+  //   }
+  // };
+
+  const playerGameboard = GameboardFactory();
+
+  const shipTypes = [
+    { type: "carrier", length: 5 },
+    { type: "battleship", length: 4 },
+    { type: "destroyer", length: 3 },
+    { type: "submarine", length: 3 },
+    { type: "patrol boat", length: 2 },
+  ];
+
+  let currentShipIndex = 0;
+  let shipPlacementMode = true;
 
   const shipPlacementHandler = (e) => {
-    const square = e.target;
-    square.classList.add("placed");
+    if (shipPlacementMode) {
+      const square = e.target;
+      const startRow = parseInt(square.dataset.row, 10);
+      const startCol = parseInt(square.dataset.col, 10);
+      const { length } = shipTypes[currentShipIndex];
+
+      const shipCoordinates = Array.from({ length }, (_, i) => {
+        const row = startRow;
+        const col = startCol + i;
+        return [row, col];
+      });
+
+      const ship = ShipFactory(length);
+      const placed = playerGameboard.placeShip(ship, shipCoordinates); // Use the gameboard object
+
+      if (placed) {
+        square.classList.add("placed");
+        shipCoordinates.forEach(([row, col]) => {
+          const placedSquare = document.querySelector(
+            `[data-row="${row}"][data-col="${col}"]`
+          );
+          placedSquare.classList.add("placed");
+        });
+
+        currentShipIndex += 1;
+
+        if (currentShipIndex === shipTypes.length) {
+          // All ships have been placed
+          shipPlacementMode = false;
+          setTimeout(() => {
+            AppHelpers.toggleModal(
+              document.querySelector(".modal.initial"),
+              "hide"
+            );
+            console.log("Placed ships:");
+            const ships = playerGameboard.getShips();
+            ships.forEach((addedShip, index) => {
+              console.log(`Ship ${index + 1} - Length: ${addedShip.length}`);
+              const shipsCoordinates =
+                playerGameboard.getShipCoordinates(addedShip);
+              console.log("Coordinates:", shipsCoordinates);
+            });
+          }, 1000);
+          // Start the game here
+        } else {
+          const nextShipType = shipTypes[currentShipIndex].type;
+          document.querySelector(".ship-type").textContent = nextShipType;
+        }
+      }
+    }
+  };
+
+  const gameboardHoverHandler = (e) => {
+    if (shipPlacementMode) {
+      const square = e.target;
+      const startRow = parseInt(square.dataset.row, 10);
+      const startCol = parseInt(square.dataset.col, 10);
+      const { length } = shipTypes[currentShipIndex];
+
+      const hoveredSquares = Array.from({ length }, (_, i) => {
+        const row = startRow;
+        const col = startCol + i;
+        return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+      });
+
+      hoveredSquares.forEach((hoveredSquare) => {
+        hoveredSquare.classList.add("hovered");
+      });
+    }
+  };
+
+  const gameboardMouseLeaveHandler = () => {
+    const hoveredSquares = document.querySelectorAll(".gameboard .hovered");
+    hoveredSquares.forEach((hoveredSquare) => {
+      hoveredSquare.classList.remove("hovered");
+    });
   };
 
   const eventListeners = [
-    { eventType: "mouseover", handler: shipHoverHandler },
+    { eventType: "mouseover", handler: gameboardHoverHandler },
+    { eventType: "mouseleave", handler: gameboardMouseLeaveHandler },
     { eventType: "click", handler: shipPlacementHandler },
   ];
 

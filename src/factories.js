@@ -35,27 +35,20 @@ export const GameboardFactory = () => {
   const getGrid = () => grid;
 
   const placeShip = (ship, coordinates) => {
-    // Convert alphanumeric to grid indices
-    const convertedCoordinates = coordinates.map((coord) =>
-      FactoryHelpers.convertToIndices(coord)
-    );
-
-    // Check if all converted coordinates are within the boundaries of the grid
-    const withinBoundaries = convertedCoordinates.every(
+    // Check if all coordinates are within the boundaries of the grid
+    const withinBoundaries = coordinates.every(
       ([row, col]) => row >= 0 && row < gridSize && col >= 0 && col < gridSize
     );
 
     // Check if there are any conflicts with existing ship placements on the grid
-    const conflicts = convertedCoordinates.some(
-      ([row, col]) => grid[row][col] !== null
-    );
+    const conflicts = coordinates.some(([row, col]) => grid[row][col] !== null);
 
     // If the ship placement is within boundaries and has no conflicts...
     if (withinBoundaries && !conflicts) {
-      // Create an object containing ship information and converted coordinates
+      // Create an object containing ship information and coordinates
       const shipInfo = {
         ship,
-        coordinates: convertedCoordinates,
+        coordinates,
       };
 
       // Place the ship on the grid by updating the corresponding cells
