@@ -6,12 +6,11 @@
 // game logic and the actual DOM manipulation.
 
 const Renderer = (() => {
-  const renderGameboard = (containerElement, eventListeners) => {
-    const container = document.querySelector(`${containerElement}`);
+  const renderGameboard = (containerElement) => {
+    const container = document.querySelector(containerElement);
 
     container.textContent = "";
 
-    // Create the 10x10 grid
     for (let row = 0; row < 10; row += 1) {
       for (let col = 0; col < 10; col += 1) {
         const square = document.createElement("div");
@@ -19,18 +18,24 @@ const Renderer = (() => {
         square.dataset.row = row;
         square.dataset.col = col;
 
-        // Attach event listeners to each square
-        eventListeners.forEach((listener) => {
-          square.addEventListener(listener.eventType, listener.handler);
-        });
-
         container.appendChild(square);
       }
     }
   };
 
+  const attachEventListeners = (containerElement, eventListeners) => {
+    const container = document.querySelector(containerElement);
+
+    container.querySelectorAll(".square").forEach((square) => {
+      eventListeners.forEach((listener) => {
+        square.addEventListener(listener.eventType, listener.handler);
+      });
+    });
+  };
+
   return {
     renderGameboard,
+    attachEventListeners,
   };
 })();
 

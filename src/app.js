@@ -21,8 +21,8 @@ import { ShipFactory, GameboardFactory } from "./factories";
 // 4. ---
 // 5. ---
 // 6. ---
-// 7. Get data from initial gameboard to playergameboard
-// 8. Refactor / clean up code --> New list
+// 7. ---
+// 8. Refactor / clean up code --> Add comments --> New list
 
 const Controller = (() => {
   const playerGameboard = GameboardFactory();
@@ -62,6 +62,10 @@ const Controller = (() => {
             `[data-row="${row}"][data-col="${col}"]`
           );
           placedSquare.classList.add("placed");
+          const initialSquare = document.querySelector(
+            `.gameboard.initial [data-row="${row}"][data-col="${col}"]`
+          );
+          initialSquare.classList.add("placed");
         });
 
         currentShipIndex += 1;
@@ -100,12 +104,22 @@ const Controller = (() => {
       const hoveredSquares = Array.from({ length }, (_, i) => {
         const row = isVertical ? startRow + i : startRow;
         const col = isVertical ? startCol : startCol + i;
-        return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        return {
+          playerSquare: document.querySelector(
+            `[data-row="${row}"][data-col="${col}"]`
+          ),
+          initialSquare: document.querySelector(
+            `.gameboard.initial [data-row="${row}"][data-col="${col}"]`
+          ),
+        };
       });
 
-      hoveredSquares.forEach((hoveredSquare) => {
-        if (hoveredSquare) {
-          hoveredSquare.classList.add("hovered");
+      hoveredSquares.forEach(({ playerSquare, initialSquare }) => {
+        if (playerSquare) {
+          playerSquare.classList.add("hovered");
+        }
+        if (initialSquare) {
+          initialSquare.classList.add("hovered");
         }
       });
     }
@@ -130,7 +144,11 @@ const Controller = (() => {
 
   const init = () => {
     AppHelpers.toggleModal(document.querySelector(".modal.endgame"), "hide");
-    Renderer.renderGameboard(".gameboard.initial", eventListeners);
+    Renderer.renderGameboard(".gameboard.initial");
+    Renderer.renderGameboard(".gameboard.player");
+    Renderer.renderGameboard(".gameboard.computer");
+    Renderer.attachEventListeners(".gameboard.initial", eventListeners);
+
     const rotateBtn = document.querySelector("#rotateBtn");
     rotateBtn.addEventListener("click", rotateShips);
   };
