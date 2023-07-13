@@ -19,34 +19,12 @@ import { ShipFactory, GameboardFactory } from "./factories";
 // 2. ---
 // 3. ---
 // 4. ---
-// 5. Implement drag and drop for each ship type
-// 6. Implement rotate button
-// 7. Hide initial modal when all ships are placed
+// 5. ---
+// 6. ---
+// 7. Get data from initial gameboard to playergameboard
+// 8. Refactor / clean up code --> New list
 
 const Controller = (() => {
-  // const shipHoverHandler = (e) => {
-  //   if (shipPlacementMode) {
-  //     const square = e.target;
-  //     const startRow = parseInt(square.dataset.row, 10);
-  //     const startCol = parseInt(square.dataset.col, 10);
-  //     const shipLength = ShipFactory(shipTypes[currentShipIndex]).length;
-
-  //     const hoveredSquares = [];
-  //     for (let i = 0; i < shipLength; i++) {
-  //       const row = startRow;
-  //       const col = startCol + i;
-  //       const hoveredSquare = document.querySelector(
-  //         `[data-row="${row}"][data-col="${col}"]`
-  //       );
-  //       hoveredSquares.push(hoveredSquare);
-  //     }
-
-  //     hoveredSquares.forEach((hoveredSquare) => {
-  //       hoveredSquare.classList.add("hovered");
-  //     });
-  //   }
-  // };
-
   const playerGameboard = GameboardFactory();
 
   const shipTypes = [
@@ -59,6 +37,7 @@ const Controller = (() => {
 
   let currentShipIndex = 0;
   let shipPlacementMode = true;
+  let isVertical = false;
 
   const shipPlacementHandler = (e) => {
     if (shipPlacementMode) {
@@ -68,13 +47,13 @@ const Controller = (() => {
       const { length } = shipTypes[currentShipIndex];
 
       const shipCoordinates = Array.from({ length }, (_, i) => {
-        const row = startRow;
-        const col = startCol + i;
+        const row = isVertical ? startRow + i : startRow;
+        const col = isVertical ? startCol : startCol + i;
         return [row, col];
       });
 
       const ship = ShipFactory(length);
-      const placed = playerGameboard.placeShip(ship, shipCoordinates); // Use the gameboard object
+      const placed = playerGameboard.placeShip(ship, shipCoordinates);
 
       if (placed) {
         square.classList.add("placed");
@@ -88,7 +67,6 @@ const Controller = (() => {
         currentShipIndex += 1;
 
         if (currentShipIndex === shipTypes.length) {
-          // All ships have been placed
           shipPlacementMode = false;
           setTimeout(() => {
             AppHelpers.toggleModal(
@@ -104,7 +82,6 @@ const Controller = (() => {
               console.log("Coordinates:", shipsCoordinates);
             });
           }, 1000);
-          // Start the game here
         } else {
           const nextShipType = shipTypes[currentShipIndex].type;
           document.querySelector(".ship-type").textContent = nextShipType;
@@ -121,13 +98,15 @@ const Controller = (() => {
       const { length } = shipTypes[currentShipIndex];
 
       const hoveredSquares = Array.from({ length }, (_, i) => {
-        const row = startRow;
-        const col = startCol + i;
+        const row = isVertical ? startRow + i : startRow;
+        const col = isVertical ? startCol : startCol + i;
         return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
       });
 
       hoveredSquares.forEach((hoveredSquare) => {
-        hoveredSquare.classList.add("hovered");
+        if (hoveredSquare) {
+          hoveredSquare.classList.add("hovered");
+        }
       });
     }
   };
@@ -139,6 +118,10 @@ const Controller = (() => {
     });
   };
 
+  const rotateShips = () => {
+    isVertical = !isVertical;
+  };
+
   const eventListeners = [
     { eventType: "mouseover", handler: gameboardHoverHandler },
     { eventType: "mouseleave", handler: gameboardMouseLeaveHandler },
@@ -148,6 +131,8 @@ const Controller = (() => {
   const init = () => {
     AppHelpers.toggleModal(document.querySelector(".modal.endgame"), "hide");
     Renderer.renderGameboard(".gameboard.initial", eventListeners);
+    const rotateBtn = document.querySelector("#rotateBtn");
+    rotateBtn.addEventListener("click", rotateShips);
   };
 
   return {
