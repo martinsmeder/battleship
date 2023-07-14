@@ -2,27 +2,14 @@ import { AppHelpers } from "./utils";
 import Renderer from "./render";
 import { ShipFactory, GameboardFactory } from "./factories";
 
-// This module can handle the game loop and coordinate the overall flow of
-// the game. It can create instances of players and gameboards, manage turns,
-// and determine when the game ends. It should primarily focus on the game
-// logic and orchestration rather than directly interacting with the DOM.
-
-// Event Listeners: You can have event listeners in a separate module or
-// directly within app.js, depending on your preference and the complexity
-// of the interactions. If you have a large number of event listeners or
-// complex event handling, it might be beneficial to separate them into a
-// dedicated module to keep the code organized. The event listeners should
-// call appropriate functions in app.js or render.js to trigger the
-// corresponding actions and UI updates.
-
-// 1. ---
-// 2. ---
-// 3. ---
-// 4. ---
-// 5. ---
-// 6. ---
-// 7. ---
-// 8. Refactor / clean up code --> Add comments --> New list
+// 1. placeComputerShips()
+// 2.
+// 3.
+// 4.
+// 5.
+// 6.
+// 7.
+// 8.
 
 const Controller = (() => {
   const playerGameboard = GameboardFactory();
@@ -77,15 +64,7 @@ const Controller = (() => {
               document.querySelector(".modal.initial"),
               "hide"
             );
-            console.log("Placed ships:");
-            const ships = playerGameboard.getShips();
-            ships.forEach((addedShip, index) => {
-              console.log(`Ship ${index + 1} - Length: ${addedShip.length}`);
-              const shipsCoordinates =
-                playerGameboard.getShipCoordinates(addedShip);
-              console.log("Coordinates:", shipsCoordinates);
-            });
-          }, 1000);
+          }, 500);
         } else {
           const nextShipType = shipTypes[currentShipIndex].type;
           document.querySelector(".ship-type").textContent = nextShipType;
@@ -105,19 +84,13 @@ const Controller = (() => {
         const row = isVertical ? startRow + i : startRow;
         const col = isVertical ? startCol : startCol + i;
         return {
-          playerSquare: document.querySelector(
-            `[data-row="${row}"][data-col="${col}"]`
-          ),
           initialSquare: document.querySelector(
             `.gameboard.initial [data-row="${row}"][data-col="${col}"]`
           ),
         };
       });
 
-      hoveredSquares.forEach(({ playerSquare, initialSquare }) => {
-        if (playerSquare) {
-          playerSquare.classList.add("hovered");
-        }
+      hoveredSquares.forEach(({ initialSquare }) => {
         if (initialSquare) {
           initialSquare.classList.add("hovered");
         }
