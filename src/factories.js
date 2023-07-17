@@ -132,15 +132,18 @@ export const GameboardFactory = () => {
     const [row, col] = FactoryHelpers.convertToIndices(coordinate);
     const cell = grid[row][col];
 
-    const ship = cell && cell.ship; // Access the ship property of the cell object
-
-    if (ship) {
+    if (cell !== null) {
+      // Ship at coordinate, it's a hit
+      const { ship } = cell;
       ship.hit(); // Increment hit count of the ship
-    } else {
-      missedAttacks.push(coordinate); // Record missed attack coordinates
+      attackedCoordinates.push(coordinate);
+      return ship; // Return the ship object when it is hit
     }
-
+    // No ship at coordinate, it's a miss
+    console.log("miss");
+    missedAttacks.push(coordinate);
     attackedCoordinates.push(coordinate);
+    return null; // Return null when it's a miss
   };
 
   const getMissedAttacks = () => missedAttacks;
@@ -151,7 +154,11 @@ export const GameboardFactory = () => {
     const ships = getShips(); // Retrieve all the ships on the gameboard
 
     // Check if all ships are sunk, return true if yes, and return false if no
-    return ships.every((ship) => ship.isSunk());
+    const result = ships.every((ship) => ship.isSunk());
+
+    console.log("All ships sunk:", result); // Log the result to test
+
+    return result;
   };
 
   return {

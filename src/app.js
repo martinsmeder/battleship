@@ -5,8 +5,8 @@ import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
 // 1. ---
 // 2. ---
-// 3. handle player attacks
-// 4. display player attacks
+// 3. ---
+// 4. ---
 // 5. handle computer attacks
 // 6. display computer attacks
 // 7. handle winner
@@ -163,52 +163,60 @@ const Controller = (() => {
     });
   };
 
-  // const computerGameboardClickHandler = (e) => {
+  // const computerAttack = () => {
   //   if (!shipPlacementMode) {
-  //     const square = e.target;
-  //     const row = parseInt(square.dataset.row, 10);
-  //     const col = parseInt(square.dataset.col, 10);
-  //     const coordinate = FactoryHelpers.convertToAlphanumeric([row, col]);
+  //     computer.attack(playerGameboard);
 
-  //     if (!computerGameboard.getAttackedCoordinates().includes(coordinate)) {
-  //       computerGameboard.receiveAttack(coordinate);
-  //       square.classList.add("attacked");
-  //       console.log("computerGameboard attacked");
+  //     const attackedShip = playerGameboard.receiveAttack(coordinate);
+  //     const square = document.querySelector(
+  //       `.gameboard.player [data-row="${coordinate[0]}"][data-col="${coordinate[1]}"]`
+  //     );
+  //     if (attackedShip) {
+  //       square.classList.add("hit");
+  //       console.log("Computer hit a ship!");
 
-  //       const ships = computerGameboard.getShips();
-  //       const attackedShip = ships.find((ship) =>
-  //         computerGameboard.getShipCoordinates(ship).includes(coordinate)
-  //       );
-
-  //       if (attackedShip) {
-  //         const shipCoordinates =
-  //           computerGameboard.getShipCoordinates(attackedShip);
-  //         shipCoordinates.forEach(([r, c]) => {
-  //           const attackedSquare = document.querySelector(
-  //             `.gameboard.computer [data-row="${r}"][data-col="${c}"]`
-  //           );
-
-  //           if (attackedSquare) {
-  //             attackedSquare.classList.add("hit");
-  //             console.log("computer ship hit");
-  //           }
-  //         });
-
-  //         if (attackedShip.isSunk()) {
-  //           if (computerGameboard.allShipsSunk()) {
-  //             console.log("Player wins!");
-  //           } else {
-  //             console.log(`Player sank the ${attackedShip.length}-unit ship!`);
-  //           }
-  //         } else {
-  //           console.log("Player hit a ship!");
-  //         }
-  //       } else {
-  //         console.log("Player missed!");
+  //       if (attackedShip.isSunk()) {
+  //         console.log(`Computer sank the ${attackedShip.length}-unit ship!`);
   //       }
+  //     } else {
+  //       square.classList.add("miss");
+  //       console.log("Computer missed!");
+  //     }
+
+  //     if (playerGameboard.allShipsSunk()) {
+  //       console.log("Computer wins!");
   //     }
   //   }
   // };
+
+  const computerGameboardClickHandler = (e) => {
+    if (!shipPlacementMode) {
+      const square = e.target;
+      const row = parseInt(square.dataset.row, 10);
+      const col = parseInt(square.dataset.col, 10);
+      const coordinate = FactoryHelpers.convertToAlphanumeric([row, col]);
+
+      if (!computerGameboard.getAttackedCoordinates().includes(coordinate)) {
+        const attackedShip = computerGameboard.receiveAttack(coordinate);
+
+        if (attackedShip) {
+          square.classList.add("hit");
+          console.log("Player hit a ship!");
+
+          if (attackedShip.isSunk()) {
+            console.log(`Player sank the ${attackedShip.length}-unit ship!`);
+          }
+        } else {
+          square.classList.add("miss");
+          console.log("Player missed!");
+        }
+
+        if (computerGameboard.allShipsSunk()) {
+          console.log("Player wins!");
+        }
+      }
+    }
+  };
 
   const rotateShips = () => {
     isVertical = !isVertical;
@@ -227,12 +235,12 @@ const Controller = (() => {
     Renderer.renderGameboard(".gameboard.computer");
     Renderer.attachEventListeners(".gameboard.initial", eventListeners);
 
-    // const computerSquares = document.querySelectorAll(
-    //   ".gameboard.computer .square"
-    // );
-    // computerSquares.forEach((square) => {
-    //   square.addEventListener("click", computerGameboardClickHandler);
-    // });
+    const computerSquares = document.querySelectorAll(
+      ".gameboard.computer .square"
+    );
+    computerSquares.forEach((square) => {
+      square.addEventListener("click", computerGameboardClickHandler);
+    });
 
     const rotateBtn = document.querySelector("#rotateBtn");
     rotateBtn.addEventListener("click", rotateShips);

@@ -59,6 +59,14 @@
     background-color: #3e3e3e;
 }
 
+.miss {
+    background-color: #6cff6c;
+}
+
+.hit {
+    background-color: #ff2a2a;
+}
+
 #gameboardContainer {
     display: flex;
     gap: 50px;
