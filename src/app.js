@@ -31,8 +31,10 @@ const Controller = (() => {
   let isVertical = false;
 
   const placeComputerShips = () => {
-    const computerShips = shipTypes.map((shipType) => {
-      const { length } = shipType;
+    const computerShips = [];
+
+    for (let i = 0; i < shipTypes.length; i += 1) {
+      const { type, length } = shipTypes[i];
       let coordinates = [];
       let placed = false;
 
@@ -43,22 +45,17 @@ const Controller = (() => {
         coordinates = [];
 
         if (isVertical) {
-          // Check if there is enough space vertically
           if (startRow + length - 1 < 10) {
-            coordinates = Array.from({ length }, (_, i) => [
-              startRow + i,
+            coordinates = Array.from({ length }, (_, j) => [
+              startRow + j,
               startCol,
             ]);
           }
-        } else {
-          // Check if there is enough space horizontally
-          // eslint-disable-next-line no-lonely-if
-          if (startCol + length - 1 < 10) {
-            coordinates = Array.from({ length }, (_, i) => [
-              startRow,
-              startCol + i,
-            ]);
-          }
+        } else if (startCol + length - 1 < 10) {
+          coordinates = Array.from({ length }, (_, j) => [
+            startRow,
+            startCol + j,
+          ]);
         }
 
         if (coordinates.length > 0) {
@@ -76,10 +73,33 @@ const Controller = (() => {
         placedSquare.classList.add("placed");
       });
 
-      return { type: shipType.type, coordinates };
+      computerShips.push({ type, coordinates });
+    }
+
+    const playerShips = playerGameboard.getShips();
+    playerShips.forEach((ship, index) => {
+      const coordinates = playerGameboard.getShipCoordinates(ship);
+      console.log(
+        `Player's ${shipTypes[index].type} coordinates: ${coordinates.join(
+          ", "
+        )}`
+      );
     });
 
-    console.log("Computer ships:", computerShips);
+    const sortedComputerShips = computerShips.sort(
+      (a, b) =>
+        shipTypes.findIndex((s) => s.type === a.type) -
+        shipTypes.findIndex((s) => s.type === b.type)
+    );
+
+    sortedComputerShips.forEach((ship) => {
+      const coordinates = ship.coordinates.map(([row, col]) =>
+        FactoryHelpers.convertToAlphanumeric([row, col])
+      );
+      console.log(
+        `Computer's ${ship.type} coordinates: ${coordinates.join(", ")}`
+      );
+    });
   };
 
   const shipPlacementHandler = (e) => {
@@ -167,8 +187,8 @@ const Controller = (() => {
       const coordinate = computer.attack(playerGameboard);
       const attackedShip = playerGameboard.receiveAttack(coordinate);
 
-      const row = parseInt(coordinate.slice(1), 10) - 1;
-      const col = coordinate.charCodeAt(0) - 65;
+      const row = parseInt(coordinate[1], 10) - 1;
+      const col = coordinate[0].charCodeAt(0) - 65;
 
       const square = document.querySelector(
         `.gameboard.player [data-row="${row}"][data-col="${col}"]`
@@ -176,12 +196,14 @@ const Controller = (() => {
 
       if (attackedShip) {
         square.classList.add("hit");
+        console.log(`Computer hit Player at: ${coordinate}`);
 
         if (attackedShip.isSunk()) {
-          console.log(`Computer sank the ${attackedShip.length}-unit ship!`);
+          console.log(`Computer sank Player's ${attackedShip}!`);
         }
       } else {
         square.classList.add("miss");
+        console.log(`Computer missed at: ${coordinate}`);
       }
 
       if (playerGameboard.allShipsSunk()) {
@@ -202,12 +224,14 @@ const Controller = (() => {
 
         if (attackedShip) {
           square.classList.add("hit");
+          console.log(`Player hit Computer at: ${coordinate}`);
 
           if (attackedShip.isSunk()) {
-            console.log(`Player sank the ${attackedShip.length}-unit ship!`);
+            console.log(`Player sank Computer's ${attackedShip}!`);
           }
         } else {
           square.classList.add("miss");
+          console.log(`Player missed at: ${coordinate}`);
         }
 
         if (computerGameboard.allShipsSunk()) {

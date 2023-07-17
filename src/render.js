@@ -33,9 +33,15 @@ const Renderer = (() => {
     });
   };
 
+  const setWinnerHeading = (winner) => {
+    const winnerHeading = document.querySelector("#winner");
+    winnerHeading.textContent = `${winner} won!`;
+  };
+
   return {
     renderGameboard,
     attachEventListeners,
+    setWinnerHeading,
   };
 })();
 
