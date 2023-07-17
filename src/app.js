@@ -7,8 +7,8 @@ import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 // 2. ---
 // 3. ---
 // 4. ---
-// 5. handle computer attacks
-// 6. display computer attacks
+// 5. ---
+// 6. ---
 // 7. handle winner
 // 8. display winner
 
@@ -16,7 +16,6 @@ const Controller = (() => {
   const playerGameboard = GameboardFactory();
   const computerGameboard = GameboardFactory();
 
-  // eslint-disable-next-line no-unused-vars
   const computer = PlayerFactory("computer");
 
   const shipTypes = [
@@ -163,33 +162,35 @@ const Controller = (() => {
     });
   };
 
-  // const computerAttack = () => {
-  //   if (!shipPlacementMode) {
-  //     computer.attack(playerGameboard);
+  const computerAttack = () => {
+    if (!shipPlacementMode) {
+      const coordinate = computer.attack(playerGameboard);
+      const attackedShip = playerGameboard.receiveAttack(coordinate);
 
-  //     const attackedShip = playerGameboard.receiveAttack(coordinate);
-  //     const square = document.querySelector(
-  //       `.gameboard.player [data-row="${coordinate[0]}"][data-col="${coordinate[1]}"]`
-  //     );
-  //     if (attackedShip) {
-  //       square.classList.add("hit");
-  //       console.log("Computer hit a ship!");
+      const row = parseInt(coordinate.slice(1), 10) - 1;
+      const col = coordinate.charCodeAt(0) - 65;
 
-  //       if (attackedShip.isSunk()) {
-  //         console.log(`Computer sank the ${attackedShip.length}-unit ship!`);
-  //       }
-  //     } else {
-  //       square.classList.add("miss");
-  //       console.log("Computer missed!");
-  //     }
+      const square = document.querySelector(
+        `.gameboard.player [data-row="${row}"][data-col="${col}"]`
+      );
 
-  //     if (playerGameboard.allShipsSunk()) {
-  //       console.log("Computer wins!");
-  //     }
-  //   }
-  // };
+      if (attackedShip) {
+        square.classList.add("hit");
 
-  const computerGameboardClickHandler = (e) => {
+        if (attackedShip.isSunk()) {
+          console.log(`Computer sank the ${attackedShip.length}-unit ship!`);
+        }
+      } else {
+        square.classList.add("miss");
+      }
+
+      if (playerGameboard.allShipsSunk()) {
+        console.log("Computer wins!");
+      }
+    }
+  };
+
+  const playerAttack = (e) => {
     if (!shipPlacementMode) {
       const square = e.target;
       const row = parseInt(square.dataset.row, 10);
@@ -201,19 +202,19 @@ const Controller = (() => {
 
         if (attackedShip) {
           square.classList.add("hit");
-          console.log("Player hit a ship!");
 
           if (attackedShip.isSunk()) {
             console.log(`Player sank the ${attackedShip.length}-unit ship!`);
           }
         } else {
           square.classList.add("miss");
-          console.log("Player missed!");
         }
 
         if (computerGameboard.allShipsSunk()) {
           console.log("Player wins!");
         }
+
+        computerAttack();
       }
     }
   };
@@ -239,7 +240,7 @@ const Controller = (() => {
       ".gameboard.computer .square"
     );
     computerSquares.forEach((square) => {
-      square.addEventListener("click", computerGameboardClickHandler);
+      square.addEventListener("click", playerAttack);
     });
 
     const rotateBtn = document.querySelector("#rotateBtn");
@@ -252,50 +253,3 @@ const Controller = (() => {
 })();
 
 Controller.init();
-
-// // Perform the computer's turn
-// computer.attack(playerGameboard);
-
-// const missedAttacks = computerGameboard.getMissedAttacks();
-// missedAttacks.forEach((missedAttack) => {
-//   const missedSquare = document.querySelector(
-//     `.gameboard.computer [data-coordinate="${missedAttack}"]`
-//   );
-//   missedSquare.classList.add("miss");
-// });
-
-// const computerAttackedCoordinates =
-//   computerGameboard.getAttackedCoordinates();
-// const lastCoordinate =
-//   computerAttackedCoordinates[computerAttackedCoordinates.length - 1];
-// const attackedShipOnComputer = playerGameboard
-//   .getShips()
-//   .find((ship) =>
-//     computerGameboard.getShipCoordinates(ship).includes(lastCoordinate)
-//   );
-
-// if (attackedShipOnComputer) {
-//   const shipCoordinates = computerGameboard.getShipCoordinates(
-//     attackedShipOnComputer
-//   );
-//   shipCoordinates.forEach((coord) => {
-//     const attackedSquare = document.querySelector(
-//       `.gameboard.computer [data-coordinate="${coord}"]`
-//     );
-//     attackedSquare.classList.add("hit");
-//   });
-
-//   if (attackedShipOnComputer.isSunk()) {
-//     if (computerGameboard.allShipsSunk()) {
-//       console.log("Computer wins!");
-//     } else {
-//       console.log(
-//         `Computer sank the ${attackedShipOnComputer.length}-unit ship!`
-//       );
-//     }
-//   } else {
-//     console.log("Computer hit a ship!");
-//   }
-// } else {
-//   console.log("Computer missed!");
-// }

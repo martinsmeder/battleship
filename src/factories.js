@@ -129,7 +129,9 @@ export const GameboardFactory = () => {
   };
 
   const receiveAttack = (coordinate) => {
-    const [row, col] = FactoryHelpers.convertToIndices(coordinate);
+    const [columnLetter, rowNumber] = coordinate;
+    const row = parseInt(rowNumber, 10) - 1;
+    const col = columnLetter.charCodeAt(0) - 65;
     const cell = grid[row][col];
 
     if (cell !== null) {
@@ -140,7 +142,6 @@ export const GameboardFactory = () => {
       return ship; // Return the ship object when it is hit
     }
     // No ship at coordinate, it's a miss
-    console.log("miss");
     missedAttacks.push(coordinate);
     attackedCoordinates.push(coordinate);
     return null; // Return null when it's a miss
@@ -202,6 +203,8 @@ export const PlayerFactory = (name) => {
 
     // Perform the attack on the enemy gameboard
     enemyGameboard.receiveAttack(coordinate);
+
+    return coordinate; // Return the coordinate as an array
   };
 
   return {
