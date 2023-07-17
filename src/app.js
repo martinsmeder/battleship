@@ -4,8 +4,7 @@ import Renderer from "./render";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
 // 1. ---
-// 2. make the computer choose between vertial or horizontal randomly without breaking the
-//    code. The isVertical = Math.random() < 0.5; causes errors
+// 2. ---
 // 3. handle player attacks
 // 4. display player attacks
 // 5. handle computer attacks
@@ -41,15 +40,34 @@ const Controller = (() => {
       while (!placed) {
         const startRow = Math.floor(Math.random() * 10);
         const startCol = Math.floor(Math.random() * 10);
-        // isVertical = Math.random() < 0.5;
-        // eslint-disable-next-line no-loop-func
-        coordinates = Array.from({ length }, (_, i) => {
-          const row = isVertical ? startRow + i : startRow;
-          const col = isVertical ? startCol : startCol + i;
-          return [row, col];
-        });
+        isVertical = Math.random() < 0.5;
+        coordinates = [];
 
-        placed = computerGameboard.placeShip(ShipFactory(length), coordinates);
+        if (isVertical) {
+          // Check if there is enough space vertically
+          if (startRow + length - 1 < 10) {
+            coordinates = Array.from({ length }, (_, i) => [
+              startRow + i,
+              startCol,
+            ]);
+          }
+        } else {
+          // Check if there is enough space horizontally
+          // eslint-disable-next-line no-lonely-if
+          if (startCol + length - 1 < 10) {
+            coordinates = Array.from({ length }, (_, i) => [
+              startRow,
+              startCol + i,
+            ]);
+          }
+        }
+
+        if (coordinates.length > 0) {
+          placed = computerGameboard.placeShip(
+            ShipFactory(length),
+            coordinates
+          );
+        }
       }
 
       coordinates.forEach(([row, col]) => {
