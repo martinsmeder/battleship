@@ -38,10 +38,21 @@ const Renderer = (() => {
     winnerHeading.textContent = `${winner} won!`;
   };
 
+  const clearGameboard = (containerElement) => {
+    const container = document.querySelector(containerElement);
+    const squares = container.querySelectorAll(".square");
+
+    squares.forEach((square) => {
+      const resetSquare = square;
+      resetSquare.className = "square"; // Reset the className to remove all classes
+    });
+  };
+
   return {
     renderGameboard,
     attachEventListeners,
     setWinnerHeading,
+    clearGameboard,
   };
 })();
 

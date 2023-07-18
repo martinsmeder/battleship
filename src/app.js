@@ -1,16 +1,6 @@
-// eslint-disable-next-line no-unused-vars
 import { AppHelpers, FactoryHelpers } from "./utils";
 import Renderer from "./render";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
-
-// 1. ---
-// 2. ---
-// 3. ---
-// 4. ---
-// 5. ---
-// 6. ---
-// 7. handle winner
-// 8. display winner
 
 const Controller = (() => {
   const playerGameboard = GameboardFactory();
@@ -29,6 +19,7 @@ const Controller = (() => {
   let currentShipIndex = 0;
   let shipPlacementMode = true;
   let isVertical = false;
+  let winner = null;
 
   const placeComputerShips = () => {
     const computerShips = [];
@@ -75,31 +66,6 @@ const Controller = (() => {
 
       computerShips.push({ type, coordinates });
     }
-
-    const playerShips = playerGameboard.getShips();
-    playerShips.forEach((ship, index) => {
-      const coordinates = playerGameboard.getShipCoordinates(ship);
-      console.log(
-        `Player's ${shipTypes[index].type} coordinates: ${coordinates.join(
-          ", "
-        )}`
-      );
-    });
-
-    const sortedComputerShips = computerShips.sort(
-      (a, b) =>
-        shipTypes.findIndex((s) => s.type === a.type) -
-        shipTypes.findIndex((s) => s.type === b.type)
-    );
-
-    sortedComputerShips.forEach((ship) => {
-      const coordinates = ship.coordinates.map(([row, col]) =>
-        FactoryHelpers.convertToAlphanumeric([row, col])
-      );
-      console.log(
-        `Computer's ${ship.type} coordinates: ${coordinates.join(", ")}`
-      );
-    });
   };
 
   const shipPlacementHandler = (e) => {
@@ -185,33 +151,35 @@ const Controller = (() => {
   const computerAttack = () => {
     if (!shipPlacementMode) {
       const coordinate = computer.attack(playerGameboard);
-      console.log(coordinate);
-      // ATTACKEDSHIP = NULL
-      // ISSUE IS WHEN SHIPS GET PLACED ON THE BOTTOM ROW
+      const attackedShip = playerGameboard.receiveAttack(coordinate);
+      const row = parseInt(coordinate.slice(1), 10) - 1;
+      const col = coordinate[0].charCodeAt(0) - 65;
 
-      // const attackedShip = playerGameboard.receiveAttack(coordinate);
-      //   const row = parseInt(coordinate[1], 10) - 1;
-      //   const col = coordinate[0].charCodeAt(0) - 65;
+      const square = document.querySelector(
+        `.gameboard.player [data-row="${row}"][data-col="${col}"]`
+      );
 
-      //   const square = document.querySelector(
-      //     `.gameboard.player [data-row="${row}"][data-col="${col}"]`
-      //   );
+      if (attackedShip) {
+        square.classList.add("hit");
+        console.log(`Computer hit Player at: ${coordinate}`);
 
-      //   if (attackedShip) {
-      //     square.classList.add("hit");
-      //     console.log(`Computer hit Player at: ${coordinate}`);
+        if (attackedShip.isSunk()) {
+          console.log(`Computer sank Player's ${attackedShip}!`);
+        }
+      } else {
+        square.classList.add("miss");
+        console.log(`Computer missed at: ${coordinate}`);
+      }
 
-      //     if (attackedShip.isSunk()) {
-      //       console.log(`Computer sank Player's ${attackedShip}!`);
-      //     }
-      //   } else {
-      //     square.classList.add("miss");
-      //     console.log(`Computer missed at: ${coordinate}`);
-      //   }
-
-      //   if (playerGameboard.allShipsSunk()) {
-      //     console.log("Computer wins!");
-      //   }
+      if (playerGameboard.allShipsSunk()) {
+        winner = "The computer";
+        Renderer.setWinnerHeading(winner);
+        AppHelpers.toggleModal(
+          document.querySelector(".modal.endgame"),
+          "show"
+        );
+        console.log("Computer wins!");
+      }
     }
   };
 
@@ -224,7 +192,7 @@ const Controller = (() => {
 
       if (!computerGameboard.getAttackedCoordinates().includes(coordinate)) {
         const attackedShip = computerGameboard.receiveAttack(coordinate);
-
+        console.log(attackedShip);
         if (attackedShip) {
           square.classList.add("hit");
           console.log(`Player hit Computer at: ${coordinate}`);
@@ -238,6 +206,12 @@ const Controller = (() => {
         }
 
         if (computerGameboard.allShipsSunk()) {
+          winner = "You";
+          Renderer.setWinnerHeading(winner);
+          AppHelpers.toggleModal(
+            document.querySelector(".modal.endgame"),
+            "show"
+          );
           console.log("Player wins!");
         }
 
@@ -256,6 +230,29 @@ const Controller = (() => {
     { eventType: "click", handler: shipPlacementHandler },
   ];
 
+  const resetGame = () => {
+    // Reset game-related variables
+    currentShipIndex = 0;
+    shipPlacementMode = true;
+    isVertical = false;
+    winner = null;
+
+    // Reset gameboard objects
+    playerGameboard.reset();
+    computerGameboard.reset();
+
+    // Clear player objects attackedCoordinates set
+    computer.clearSet();
+
+    // Remove hit and miss classes from all squares
+    Renderer.clearGameboard(".gameboard.initial");
+    Renderer.clearGameboard(".gameboard.player");
+    Renderer.clearGameboard(".gameboard.computer");
+
+    // Reset shipTypes
+    document.querySelector(".ship-type").textContent = shipTypes[0].type;
+  };
+
   const init = () => {
     AppHelpers.toggleModal(document.querySelector(".modal.endgame"), "hide");
     Renderer.renderGameboard(".gameboard.initial");
@@ -272,6 +269,13 @@ const Controller = (() => {
 
     const rotateBtn = document.querySelector("#rotateBtn");
     rotateBtn.addEventListener("click", rotateShips);
+
+    const playAgainButton = document.querySelector("#newGame");
+    playAgainButton.addEventListener("click", () => {
+      resetGame();
+      AppHelpers.toggleModal(document.querySelector(".modal.endgame"), "hide");
+      AppHelpers.toggleModal(document.querySelector(".modal.initial"), "show");
+    });
   };
 
   return {

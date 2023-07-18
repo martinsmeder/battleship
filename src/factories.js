@@ -29,8 +29,8 @@ export const GameboardFactory = () => {
     Array(gridSize).fill(null)
   );
 
-  const attackedCoordinates = [];
-  const missedAttacks = [];
+  let attackedCoordinates = [];
+  let missedAttacks = [];
 
   const getGrid = () => grid;
 
@@ -111,6 +111,25 @@ export const GameboardFactory = () => {
     return ships;
   };
 
+  const getAllShips = () => {
+    const ships = [];
+
+    // Iterate through each cell of the grid
+    for (let row = 0; row < gridSize; row += 1) {
+      for (let col = 0; col < gridSize; col += 1) {
+        const cell = grid[row][col];
+        // Check if the cell contains a ship and it's not already included in the ships array
+        if (cell !== null && cell.ship && !ships.includes(cell.ship)) {
+          // Add the ship to the ships array
+          ships.push(cell.ship);
+        }
+      }
+    }
+
+    console.log(ships);
+    return ships;
+  };
+
   const getShipCoordinates = (ship) => {
     const coordinates = [];
 
@@ -149,10 +168,6 @@ export const GameboardFactory = () => {
     return null; // Return null when it's a miss
   };
 
-  const getMissedAttacks = () => missedAttacks;
-
-  const getAttackedCoordinates = () => attackedCoordinates;
-
   const allShipsSunk = () => {
     const ships = getShips(); // Retrieve all the ships on the gameboard
 
@@ -164,15 +179,34 @@ export const GameboardFactory = () => {
     return result;
   };
 
+  const reset = () => {
+    // Clear the grid by setting all cells to null
+    grid.forEach((row, rowIndex) => {
+      row.forEach((_, colIndex) => {
+        grid[rowIndex][colIndex] = null;
+      });
+    });
+
+    // Reassign empty arrays to clear the contents of attackedCoordinates and missedAttacks
+    attackedCoordinates = [];
+    missedAttacks = [];
+  };
+
+  const getMissedAttacks = () => missedAttacks;
+
+  const getAttackedCoordinates = () => attackedCoordinates;
+
   return {
     getGrid,
     placeShip,
     getShips,
+    getAllShips,
     getShipCoordinates,
     receiveAttack,
     getMissedAttacks,
     getAttackedCoordinates,
     allShipsSunk,
+    reset,
   };
 };
 
@@ -203,14 +237,22 @@ export const PlayerFactory = (name) => {
     // Add the attacked coordinate to the players set of attacked coordinates
     attackedCoordinates.add(coordinate);
 
-    // Perform the attack on the enemy gameboard
-    enemyGameboard.receiveAttack(coordinate);
+    // // Perform the attack on the enemy gameboard
+    // enemyGameboard.receiveAttack(coordinate);
 
     return coordinate; // Return the coordinate as an array
+  };
+
+  const getAttackedSet = () => attackedCoordinates;
+
+  const clearSet = () => {
+    attackedCoordinates.clear();
   };
 
   return {
     name,
     attack,
+    getAttackedSet,
+    clearSet,
   };
 };
