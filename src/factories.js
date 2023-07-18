@@ -37,7 +37,8 @@ export const GameboardFactory = () => {
   const placeShip = (ship, coordinates) => {
     // Check if all coordinates are within the boundaries of the grid
     const withinBoundaries = coordinates.every(
-      ([row, col]) => row >= 0 && row < gridSize && col >= 0 && col < gridSize
+      ([row, col]) =>
+        row > 0 && row < gridSize - 1 && col > 0 && col < gridSize - 1
     );
 
     // Check if there are any conflicts with existing ship placements on the grid
@@ -45,6 +46,7 @@ export const GameboardFactory = () => {
 
     // Check if there are any adjacent conflicts with existing ship placements on the grid
     const adjacentConflicts = coordinates.some(([row, col]) => {
+      // Define the adjacent coordinates around the current coordinate
       const adjacentCoordinates = [
         [row - 1, col], // Up
         [row + 1, col], // Down
@@ -56,6 +58,7 @@ export const GameboardFactory = () => {
         [row + 1, col + 1], // Diagonal Down-Right
       ];
 
+      // Check if any adjacent coordinate has a ship placed on it
       return adjacentCoordinates.some(
         ([adjRow, adjCol]) =>
           adjRow >= 0 &&
@@ -66,8 +69,7 @@ export const GameboardFactory = () => {
       );
     });
 
-    // If the ship placement is within grid boundaries, has no conflicts and no adjacent
-    // conflicts...
+    // If the ship placement is within grid boundaries, has no conflicts, and no adjacent conflicts...
     if (withinBoundaries && !conflicts && !adjacentConflicts) {
       // Create an object containing ship information and coordinates
       const shipInfo = {

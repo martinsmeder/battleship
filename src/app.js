@@ -185,30 +185,33 @@ const Controller = (() => {
   const computerAttack = () => {
     if (!shipPlacementMode) {
       const coordinate = computer.attack(playerGameboard);
-      const attackedShip = playerGameboard.receiveAttack(coordinate);
+      console.log(coordinate);
+      // ATTACKEDSHIP = NULL
+      // ISSUE IS WHEN SHIPS GET PLACED ON THE BOTTOM ROW
 
-      const row = parseInt(coordinate[1], 10) - 1;
-      const col = coordinate[0].charCodeAt(0) - 65;
+      // const attackedShip = playerGameboard.receiveAttack(coordinate);
+      //   const row = parseInt(coordinate[1], 10) - 1;
+      //   const col = coordinate[0].charCodeAt(0) - 65;
 
-      const square = document.querySelector(
-        `.gameboard.player [data-row="${row}"][data-col="${col}"]`
-      );
+      //   const square = document.querySelector(
+      //     `.gameboard.player [data-row="${row}"][data-col="${col}"]`
+      //   );
 
-      if (attackedShip) {
-        square.classList.add("hit");
-        console.log(`Computer hit Player at: ${coordinate}`);
+      //   if (attackedShip) {
+      //     square.classList.add("hit");
+      //     console.log(`Computer hit Player at: ${coordinate}`);
 
-        if (attackedShip.isSunk()) {
-          console.log(`Computer sank Player's ${attackedShip}!`);
-        }
-      } else {
-        square.classList.add("miss");
-        console.log(`Computer missed at: ${coordinate}`);
-      }
+      //     if (attackedShip.isSunk()) {
+      //       console.log(`Computer sank Player's ${attackedShip}!`);
+      //     }
+      //   } else {
+      //     square.classList.add("miss");
+      //     console.log(`Computer missed at: ${coordinate}`);
+      //   }
 
-      if (playerGameboard.allShipsSunk()) {
-        console.log("Computer wins!");
-      }
+      //   if (playerGameboard.allShipsSunk()) {
+      //     console.log("Computer wins!");
+      //   }
     }
   };
 
