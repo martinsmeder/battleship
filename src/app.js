@@ -5,8 +5,8 @@ import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
 // 1. ---
 // 2. ---
-// 3. ---
-// 4. Style
+// 3. Fix bug so that ship placement and class-adding works next to all grid borders
+// 4. Style => Modals
 // 5. Push to gh-pages and add readme
 
 const Controller = (() => {
@@ -65,15 +65,6 @@ const Controller = (() => {
           ); // Attempt to place the ship on the computer gameboard
         }
       }
-
-      coordinates.forEach(([row, col]) => {
-        // Add 'placed' class to the corresponding squares on the gameboard UI to indicate ship placement
-        const placedSquare = document.querySelector(
-          `.gameboard.computer [data-row="${row}"][data-col="${col}"]`
-        );
-        placedSquare.classList.add("placed");
-      });
-
       computerShips.push({ type, coordinates });
     }
   };
