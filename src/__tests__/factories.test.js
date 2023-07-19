@@ -1,6 +1,6 @@
 /* global describe, it, expect, beforeEach */
 
-import FactoryHelpers from "../utils";
+import { FactoryHelpers } from "../utils";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "../factories";
 
 // ========================================= ShipFactory =====================================
@@ -58,22 +58,33 @@ describe("GameboardFactory", () => {
   it("should place a ship at specific coordinates", () => {
     // Incoming command - Assert the direct public side effects
     const ship = ShipFactory(3);
-    const coordinates = ["A1", "A2", "A3"];
+    const coordinates = [
+      [4, 4],
+      [4, 5],
+      [4, 6],
+    ];
 
-    gameboard.placeShip(ship, coordinates);
+    const result = gameboard.placeShip(ship, coordinates);
 
-    const ships = gameboard.getShips();
-
-    expect(ships).toContain(ship);
-    expect(gameboard.getShipCoordinates(ships[0])).toEqual(coordinates);
+    expect(result).toBe(true);
+    expect(gameboard.getShips()).toContain(ship);
+    expect(gameboard.getShipCoordinates(ship)).toEqual(coordinates);
   });
 
   it("should return false when placing a ship at overlapping coordinates", () => {
     // Incoming command - Assert the direct public side effect
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
-    const coordinates1 = ["A1", "A2", "A3"];
-    const coordinates2 = ["A2", "A3"];
+    const coordinates1 = [
+      [4, 4],
+      [4, 5],
+      [4, 6],
+    ];
+
+    const coordinates2 = [
+      [4, 5],
+      [4, 6],
+    ];
 
     gameboard.placeShip(ship1, coordinates1);
 
@@ -85,14 +96,17 @@ describe("GameboardFactory", () => {
   it("should correctly handle receiving an attack on a ship", () => {
     // Incoming command - Assert the direct public side effect
     const ship = ShipFactory(3);
-    const coordinates = ["A1", "A2", "A3"];
+    const coordinates = [
+      [2, 1],
+      [2, 2],
+      [2, 3],
+    ];
 
     gameboard.placeShip(ship, coordinates);
 
-    gameboard.receiveAttack("A1");
-    gameboard.receiveAttack("A2");
+    gameboard.receiveAttack("C3");
 
-    expect(ship.hits).toBe(2);
+    expect(ship.hits).toBe(1);
   });
 
   it("should correctly handle receiving a missed attack", () => {
@@ -120,9 +134,21 @@ describe("GameboardFactory", () => {
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
     const ship3 = ShipFactory(4);
-    const coordinates1 = ["A1", "A2", "A3"];
-    const coordinates2 = ["B1", "B2"];
-    const coordinates3 = ["C1", "C2", "C3", "C4"];
+    const coordinates1 = [
+      [2, 2],
+      [2, 3],
+      [2, 4],
+    ];
+    const coordinates2 = [
+      [4, 4],
+      [4, 5],
+    ];
+    const coordinates3 = [
+      [6, 6],
+      [6, 7],
+      [6, 8],
+      [6, 9],
+    ];
 
     gameboard.placeShip(ship1, coordinates1);
     gameboard.placeShip(ship2, coordinates2);
@@ -146,9 +172,21 @@ describe("GameboardFactory", () => {
     const ship1 = ShipFactory(3);
     const ship2 = ShipFactory(2);
     const ship3 = ShipFactory(4);
-    const coordinates1 = ["A1", "A2", "A3"];
-    const coordinates2 = ["B1", "B2"];
-    const coordinates3 = ["C1", "C2", "C3", "C4"];
+    const coordinates1 = [
+      [2, 2],
+      [2, 3],
+      [2, 4],
+    ];
+    const coordinates2 = [
+      [4, 4],
+      [4, 5],
+    ];
+    const coordinates3 = [
+      [6, 6],
+      [6, 7],
+      [6, 8],
+      [6, 9],
+    ];
 
     gameboard.placeShip(ship1, coordinates1);
     gameboard.placeShip(ship2, coordinates2);
@@ -194,7 +232,8 @@ describe("PlayerFactory", () => {
       // Incoming command - Assert the direct public side effect
       const initialMissedAttacks = enemyGameboard.getMissedAttacks().length;
 
-      player.attack(enemyGameboard);
+      const coordinate = player.attack(enemyGameboard);
+      enemyGameboard.receiveAttack(coordinate);
 
       const updatedMissedAttacks = enemyGameboard.getMissedAttacks().length;
 
@@ -204,15 +243,21 @@ describe("PlayerFactory", () => {
     it("should increase the ship's hit count when hitting a target", () => {
       // Incoming command - Assert the direct public side effect
       const ship = ShipFactory(3);
-      const coordinates = ["A1", "A2", "A3"];
+      const coordinates = [
+        [2, 1],
+        [2, 2],
+        [2, 3],
+      ];
       enemyGameboard.placeShip(ship, coordinates);
 
       const initialHits = ship.hits;
 
+      // Hit every cell of the grid once
       const gridSize = enemyGameboard.getGrid().length;
       for (let row = 0; row < gridSize; row += 1) {
         for (let col = 0; col < gridSize; col += 1) {
-          player.attack(enemyGameboard);
+          const coordinate = player.attack(enemyGameboard);
+          enemyGameboard.receiveAttack(coordinate);
         }
       }
 
@@ -226,21 +271,17 @@ describe("PlayerFactory", () => {
       const attackedCoordinates = new Set();
       const gridSize = enemyGameboard.getGrid().length;
 
+      // Hit every cell of the grid once
       for (let row = 0; row < gridSize; row += 1) {
         for (let col = 0; col < gridSize; col += 1) {
-          player.attack(enemyGameboard);
-
-          // Get the most recent attacked coordinate
-          const attackedCoordinate =
-            enemyGameboard.getAttackedCoordinates().pop() || "";
+          const coordinate = player.attack(enemyGameboard);
 
           // Check if the attacked coordinate is unique
-          const isUniqueCoordinate =
-            !attackedCoordinates.has(attackedCoordinate);
+          const isUniqueCoordinate = !attackedCoordinates.has(coordinate);
 
           expect(isUniqueCoordinate).toBe(true);
 
-          attackedCoordinates.add(attackedCoordinate);
+          attackedCoordinates.add(coordinate);
         }
       }
     });
@@ -249,18 +290,13 @@ describe("PlayerFactory", () => {
       // Incoming command - Assert the direct public side effect
       const gridSize = enemyGameboard.getGrid().length;
       const validCoordinates = FactoryHelpers.getAllValidCoordinates(gridSize);
-
       const attackedCoordinates = new Set();
 
+      // Hit every cell on the grid once
       for (let row = 0; row < gridSize; row += 1) {
         for (let col = 0; col < gridSize; col += 1) {
-          player.attack(enemyGameboard);
-
-          // Get the most recent attacked coordinate
-          const attackedCoordinate =
-            enemyGameboard.getAttackedCoordinates().pop() || "";
-
-          attackedCoordinates.add(attackedCoordinate);
+          const coordinate = player.attack(enemyGameboard);
+          attackedCoordinates.add(coordinate);
         }
       }
 

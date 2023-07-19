@@ -2,19 +2,17 @@ import { AppHelpers, FactoryHelpers } from "./utils";
 import Renderer from "./render";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
+// 1. Refactor code (as simple and understandable as possible)
+// 2. Make tests pass
+// 3. Add comments
+// 4. Style
+// 5. Push to gh-pages and add readme
+
 const Controller = (() => {
   const playerGameboard = GameboardFactory();
   const computerGameboard = GameboardFactory();
 
   const computer = PlayerFactory("computer");
-
-  const shipTypes = [
-    { type: "carrier", length: 5 },
-    { type: "battleship", length: 4 },
-    { type: "destroyer", length: 3 },
-    { type: "submarine", length: 3 },
-    { type: "patrol boat", length: 2 },
-  ];
 
   let currentShipIndex = 0;
   let shipPlacementMode = true;
@@ -24,8 +22,8 @@ const Controller = (() => {
   const placeComputerShips = () => {
     const computerShips = [];
 
-    for (let i = 0; i < shipTypes.length; i += 1) {
-      const { type, length } = shipTypes[i];
+    for (let i = 0; i < AppHelpers.shipTypes.length; i += 1) {
+      const { type, length } = AppHelpers.shipTypes[i];
       let coordinates = [];
       let placed = false;
 
@@ -73,7 +71,7 @@ const Controller = (() => {
       const square = e.target;
       const startRow = parseInt(square.dataset.row, 10);
       const startCol = parseInt(square.dataset.col, 10);
-      const { length } = shipTypes[currentShipIndex];
+      const { length } = AppHelpers.shipTypes[currentShipIndex];
 
       const shipCoordinates = Array.from({ length }, (_, i) => {
         const row = isVertical ? startRow + i : startRow;
@@ -99,7 +97,7 @@ const Controller = (() => {
 
         currentShipIndex += 1;
 
-        if (currentShipIndex === shipTypes.length) {
+        if (currentShipIndex === AppHelpers.shipTypes.length) {
           shipPlacementMode = false;
           placeComputerShips();
           setTimeout(() => {
@@ -109,7 +107,7 @@ const Controller = (() => {
             );
           }, 500);
         } else {
-          const nextShipType = shipTypes[currentShipIndex].type;
+          const nextShipType = AppHelpers.shipTypes[currentShipIndex].type;
           document.querySelector(".ship-type").textContent = nextShipType;
         }
       }
@@ -121,7 +119,7 @@ const Controller = (() => {
       const square = e.target;
       const startRow = parseInt(square.dataset.row, 10);
       const startCol = parseInt(square.dataset.col, 10);
-      const { length } = shipTypes[currentShipIndex];
+      const { length } = AppHelpers.shipTypes[currentShipIndex];
 
       const hoveredSquares = Array.from({ length }, (_, i) => {
         const row = isVertical ? startRow + i : startRow;
@@ -161,14 +159,8 @@ const Controller = (() => {
 
       if (attackedShip) {
         square.classList.add("hit");
-        console.log(`Computer hit Player at: ${coordinate}`);
-
-        if (attackedShip.isSunk()) {
-          console.log(`Computer sank Player's ${attackedShip}!`);
-        }
       } else {
         square.classList.add("miss");
-        console.log(`Computer missed at: ${coordinate}`);
       }
 
       if (playerGameboard.allShipsSunk()) {
@@ -178,7 +170,6 @@ const Controller = (() => {
           document.querySelector(".modal.endgame"),
           "show"
         );
-        console.log("Computer wins!");
       }
     }
   };
@@ -195,14 +186,8 @@ const Controller = (() => {
         console.log(attackedShip);
         if (attackedShip) {
           square.classList.add("hit");
-          console.log(`Player hit Computer at: ${coordinate}`);
-
-          if (attackedShip.isSunk()) {
-            console.log(`Player sank Computer's ${attackedShip}!`);
-          }
         } else {
           square.classList.add("miss");
-          console.log(`Player missed at: ${coordinate}`);
         }
 
         if (computerGameboard.allShipsSunk()) {
@@ -212,9 +197,7 @@ const Controller = (() => {
             document.querySelector(".modal.endgame"),
             "show"
           );
-          console.log("Player wins!");
         }
-
         computerAttack();
       }
     }
@@ -250,7 +233,8 @@ const Controller = (() => {
     Renderer.clearGameboard(".gameboard.computer");
 
     // Reset shipTypes
-    document.querySelector(".ship-type").textContent = shipTypes[0].type;
+    document.querySelector(".ship-type").textContent =
+      AppHelpers.shipTypes[0].type;
   };
 
   const init = () => {

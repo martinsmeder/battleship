@@ -139,9 +139,8 @@ export const GameboardFactory = () => {
         const cell = grid[row][col];
         // Check if the cell exists and contains the specified ship
         if (cell && cell.ship === ship) {
-          // Convert the row and column indices to alphanumeric coordinates and add them to
-          // the coordinates array
-          coordinates.push(FactoryHelpers.convertToAlphanumeric([row, col]));
+          // Add to coordinates array
+          coordinates.push([row, col]);
         }
       }
     }
@@ -173,8 +172,6 @@ export const GameboardFactory = () => {
 
     // Check if all ships are sunk, return true if yes, and return false if no
     const result = ships.every((ship) => ship.isSunk());
-
-    console.log("All ships sunk:", result); // Log the result to test
 
     return result;
   };
@@ -236,9 +233,6 @@ export const PlayerFactory = (name) => {
 
     // Add the attacked coordinate to the players set of attacked coordinates
     attackedCoordinates.add(coordinate);
-
-    // // Perform the attack on the enemy gameboard
-    // enemyGameboard.receiveAttack(coordinate);
 
     return coordinate; // Return the coordinate as an array
   };
