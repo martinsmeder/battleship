@@ -5,11 +5,45 @@
 }
 
 #container {
+    font-family: 'Play', sans-serif;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+}
+
+header {
+    width: 100%;
+    text-align: center;
+    font-size: 2.5rem;
+    border-bottom: 2px solid #000;
+    box-shadow: 0 0 .9rem #000;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    font-size: 1.5rem;
+    border-top: 2px solid #000;
+    box-shadow: 0 0 .9rem #000;
+    padding: 20px;
+    gap: 5px;
+}
+
+footer a {
+    text-decoration: none;
+    color: #000;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+footer a:nth-child(2) {
+    font-size: 1.2rem;
 }
 
 .overlay {
@@ -26,6 +60,7 @@
 }
 
 .modal {
+    font-family: 'Play', sans-serif;
     background-color: #FFF;
     padding: 25px;
     border: 2px solid #000;
@@ -55,23 +90,31 @@
     background-color: #6cff6c;
 }
 
-.invalid {
-    background-color: #ff2a2a;
-}
-
 .placed {
     background-color: #3e3e3e;
 }
 
 .miss {
-    background-color: #6cff6c;
+    background-color: #cccccc;
 }
 
 .hit {
-    background-color: #ff2a2a;
+    background-color: #ff4f4f;
 }
 
 #gameboardContainer {
     display: flex;
     gap: 50px;
+}
+
+#player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#computer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

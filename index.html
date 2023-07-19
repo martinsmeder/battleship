@@ -4,22 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship</title>
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Play:wght@700&display=swap" rel="stylesheet">
+    <!-- OTHER LINKS -->
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link href="style.css" rel="stylesheet">
     <script src="main.js" defer></script>
 </head>
 <body>
     <div id="container">
-        <header>BATTLESHIP</header>
+        <header>
+            <h1>BATTLESHIP</h1>
+        </header>
 
         <main>
             <div id="gameboardContainer">
-                <div class="gameboard player">GAMEBOARD PLAYER</div>
-                <div class="gameboard computer">GAMEBOARD COMPUTER</div>
+                <div id="player">
+                    <h2>Player</h2>
+                    <div class="gameboard player"></div>
+                </div>
+                
+                <div id="computer">
+                    <h2>Computer</h2>
+                    <div class="gameboard computer"></div>
+                </div>
+                
             </div>
         </main>
     
         <footer>
             <a href="https://github.com/martinsmeder" target="_blank">Coded by: Martin Smeder</a>
+            <a href="https://www.freepik.com/icon/battleship_7445202#position=93&page=1&term=battleship&fromView=search" target="_blank">Icon by: Umeicon</a>
         </footer>
     </div>
 
