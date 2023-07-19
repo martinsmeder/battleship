@@ -55,6 +55,10 @@
     background-color: #6cff6c;
 }
 
+.invalid {
+    background-color: #ff2a2a;
+}
+
 .placed {
     background-color: #3e3e3e;
 }
