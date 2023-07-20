@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-lonely-if */
 import { AppHelpers, FactoryHelpers } from "./utils";
 import Renderer from "./render";
@@ -5,7 +6,8 @@ import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
 // 1. ---
 // 2. ---
-// 3. Fix bug so that ship placement and class-adding works next to all grid borders
+// 3. ---
+// 4. Make the computer try adjacent locations if getting a hit
 // 4. Style => Modals
 // 5. Push to gh-pages and add readme
 
@@ -21,60 +23,66 @@ const Controller = (() => {
   let winner = null;
 
   const placeComputerShips = () => {
-    const computerShips = [];
+    for (const shipType of AppHelpers.shipTypes) {
+      const { length } = shipType;
+      const ship = ShipFactory(length);
 
-    for (let i = 0; i < AppHelpers.shipTypes.length; i += 1) {
-      // Loop through shipTypes array
-      const { type, length } = AppHelpers.shipTypes[i]; // Get ship type and length
-      let coordinates = [];
-      let placed = false; // Flag to track if ship placement is successful
+      const gridSize = 10;
+      let coordinates;
+      let placed = false;
 
       while (!placed) {
-        // Loop until ship is placed
-        const startRow = Math.floor(Math.random() * 10); // Generate a random start row (0 to 9)
-        const startCol = Math.floor(Math.random() * 10); // Generate a random start column (0 to 9)
-        isVertical = Math.random() < 0.5; // Randomly determine if ship should be placed vertically
+        // Generate random startRow and startCol within the grid boundaries
+        const startRow = Math.floor(Math.random() * gridSize);
+        const startCol = Math.floor(Math.random() * gridSize);
 
-        coordinates = []; // Reset coordinates array
+        // Randomly choose whether the ship will be placed vertically or horizontally
+        isVertical = Math.random() < 0.5;
 
-        if (isVertical) {
-          // If ship is vertical
-          if (startRow + length - 1 < 10) {
-            // Check if ship can fit vertically within the gameboard boundaries
-            coordinates = Array.from({ length }, (_, j) => [
-              startRow + j,
-              startCol,
-            ]);
-          }
-        } else {
-          // If ship is horizontal
-          if (startCol + length - 1 < 10) {
-            // Check if ship can fit horizontally within the gameboard boundaries
-            coordinates = Array.from({ length }, (_, j) => [
-              startRow,
-              startCol + j,
-            ]);
-          }
+        if (isVertical && startRow + length <= gridSize) {
+          // Generate the coordinates for a vertically placed ship
+          coordinates = Array.from({ length }, (_, i) => [
+            startRow + i,
+            startCol,
+          ]);
+        } else if (!isVertical && startCol + length <= gridSize) {
+          // Generate the coordinates for a horizontally placed ship
+          coordinates = Array.from({ length }, (_, i) => [
+            startRow,
+            startCol + i,
+          ]);
         }
 
-        if (coordinates.length > 0) {
-          // If valid ship coordinates are generated
-          placed = computerGameboard.placeShip(
-            ShipFactory(length),
-            coordinates
-          ); // Attempt to place the ship on the computer gameboard
+        if (coordinates) {
+          // Check if the ship can be placed at the generated coordinates
+          placed = computerGameboard.placeShip(ship, coordinates);
         }
       }
-      computerShips.push({ type, coordinates });
+
+      // Get the ship coordinates
+      const coordinate = computerGameboard.getShipCoordinates(ship);
+
+      // Loop through them and add a placed class
+      for (const [row, col] of coordinate) {
+        const convertedCoordinate = FactoryHelpers.convertToAlphanumeric([
+          row,
+          col,
+        ]);
+        const placedSquare = document.querySelector(
+          `.gameboard.computer [data-coordinate="${convertedCoordinate}"]`
+        );
+        placedSquare.classList.add("placed");
+      }
     }
   };
 
   const shipPlacementHandler = (e) => {
     if (shipPlacementMode) {
-      const square = e.target; // Get the clicked square element
-      const startRow = parseInt(square.dataset.row, 10); // Get the starting row
-      const startCol = parseInt(square.dataset.col, 10); // Get the starting column
-      const { length } = AppHelpers.shipTypes[currentShipIndex]; // Get the length of the ship
+      const square = e.target;
+      const { coordinate } = square.dataset;
+      const { length } = AppHelpers.shipTypes[currentShipIndex];
+
+      const [startRow, startCol] = FactoryHelpers.convertToIndices(coordinate);
 
       // Generate an array of ship coordinates based on the ship length
       const shipCoordinates = Array.from({ length }, (_, i) => {
@@ -93,14 +101,18 @@ const Controller = (() => {
         // If ship placement is successful
         square.classList.add("placed");
         shipCoordinates.forEach(([row, col]) => {
-          // Iterate over the ship coordinates
           const placedSquare = document.querySelector(
-            `[data-row="${row}"][data-col="${col}"]`
-          ); // Get the corresponding square element on the gameboard UI
+            `[data-coordinate="${FactoryHelpers.convertToAlphanumeric([
+              row,
+              col,
+            ])}"]`
+          );
           placedSquare.classList.add("placed");
           const initialSquare = document.querySelector(
-            `.gameboard.initial [data-row="${row}"][data-col="${col}"]`
-          ); // Get the corresponding square element on the initial ship placement UI
+            `.gameboard.initial [data-coordinate="${FactoryHelpers.convertToAlphanumeric(
+              [row, col]
+            )}"]`
+          );
           initialSquare.classList.add("placed");
         });
 
@@ -131,11 +143,12 @@ const Controller = (() => {
   const gameboardHoverHandler = (e) => {
     if (shipPlacementMode) {
       // Check if ship placement mode is active
-      const square = e.target; // Get the hovered square element
-      const startRow = parseInt(square.dataset.row, 10); // Get the starting row
-      const startCol = parseInt(square.dataset.col, 10); // Get the starting column
+      const square = e.target;
+      // eslint-disable-next-line prefer-destructuring
+      const coordinate = square.dataset.coordinate;
       const { length } = AppHelpers.shipTypes[currentShipIndex]; // Get the length of the ship
 
+      const [startRow, startCol] = FactoryHelpers.convertToIndices(coordinate);
       // Generate an array of hovered squares based on the ship length
       const hoveredSquares = Array.from({ length }, (_, i) => {
         // Calculate the row coordinate based on vertical or horizontal placement
@@ -144,8 +157,10 @@ const Controller = (() => {
         const col = isVertical ? startCol : startCol + i;
         return {
           initialSquare: document.querySelector(
-            `.gameboard.initial [data-row="${row}"][data-col="${col}"]`
-          ), // Get the corresponding square element on the initial ship placement UI
+            `.gameboard.initial [data-coordinate="${FactoryHelpers.convertToAlphanumeric(
+              [row, col]
+            )}"]`
+          ),
         };
       });
 
@@ -172,13 +187,11 @@ const Controller = (() => {
       const coordinate = computer.attack(playerGameboard);
       // Receive the attack on the player's gameboard and get the attacked ship (if any)
       const attackedShip = playerGameboard.receiveAttack(coordinate);
-      // Extract the row number from the coordinate and convert it to an index
-      const row = parseInt(coordinate.slice(1), 10) - 1;
-      // Extract the column letter from the coordinate and convert it to a column index
-      const col = coordinate[0].charCodeAt(0) - 65;
+
+      console.log(`computerAttack() at: ${coordinate}`);
 
       const square = document.querySelector(
-        `.gameboard.player [data-row="${row}"][data-col="${col}"]`
+        `.gameboard.player [data-coordinate="${coordinate}"]`
       ); // Get the corresponding square element on the player's gameboard
 
       if (attackedShip) {
@@ -201,11 +214,11 @@ const Controller = (() => {
   const playerAttack = (e) => {
     if (!shipPlacementMode) {
       const square = e.target; // Get the clicked square element
-      const row = parseInt(square.dataset.row, 10); // Extract the row index
-      const col = parseInt(square.dataset.col, 10); // Extract the column index
+      // eslint-disable-next-line prefer-destructuring
+      const coordinate = square.dataset.coordinate;
       // Convert the row and column indices to an alphanumeric coordinate
-      const coordinate = FactoryHelpers.convertToAlphanumeric([row, col]);
 
+      console.log(`playerAttack() at: ${coordinate}`);
       // Check if the coordinate has not been previously attacked
       if (!computerGameboard.getAttackedCoordinates().includes(coordinate)) {
         // Receive the attack on the computer's gameboard and get the attacked ship (if any)

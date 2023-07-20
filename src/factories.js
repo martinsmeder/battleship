@@ -37,8 +37,7 @@ export const GameboardFactory = () => {
   const placeShip = (ship, coordinates) => {
     // Check if all coordinates are within the boundaries of the grid
     const withinBoundaries = coordinates.every(
-      ([row, col]) =>
-        row > 0 && row < gridSize - 1 && col > 0 && col < gridSize - 1
+      ([row, col]) => row >= 0 && row < gridSize && col >= 0 && col < gridSize
     );
 
     // Check if there are any conflicts with existing ship placements on the grid
@@ -126,7 +125,6 @@ export const GameboardFactory = () => {
       }
     }
 
-    console.log(ships);
     return ships;
   };
 
@@ -150,7 +148,7 @@ export const GameboardFactory = () => {
 
   const receiveAttack = (coordinate) => {
     const [columnLetter, rowNumber] = coordinate;
-    const row = parseInt(rowNumber, 10) - 1;
+    const row = parseInt(rowNumber, 10);
     const col = columnLetter.charCodeAt(0) - 65;
     const cell = grid[row][col];
 
