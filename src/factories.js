@@ -205,44 +205,121 @@ export const GameboardFactory = () => {
   };
 };
 
-export const PlayerFactory = (name) => {
+export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
   const attackedCoordinates = new Set(); // Set to keep track of attacked coordinates
 
-  const attack = (enemyGameboard) => {
+  const getNextCoordinateInDirection = (coordinate, direction) => {
+    const [colLetter, rowNumber] = coordinate;
+    const row = parseInt(rowNumber, 10);
+    const col = colLetter.charCodeAt(0) - 65;
+
+    let nextRow = row;
+    let nextCol = col;
+
+    switch (direction) {
+      case "up":
+        nextRow -= 1;
+        break;
+      case "down":
+        nextRow += 1;
+        break;
+      case "left":
+        nextCol -= 1;
+        break;
+      case "right":
+        nextCol += 1;
+        break;
+      default:
+        break;
+    }
+
+    return FactoryHelpers.convertToAlphanumeric([nextRow, nextCol]);
+  };
+
+  const getNextDirections = () => {
+    const directions = ["up", "down", "left", "right"];
+    if (!currentDirection) {
+      // If currentDirection is not set, shuffle the directions to try them in random order
+      for (let i = directions.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [directions[i], directions[j]] = [directions[j], directions[i]];
+      }
+    } else {
+      // If currentDirection is set, move it to the end of the list, so it will try other directions first
+      const index = directions.indexOf(currentDirection);
+      if (index !== -1) {
+        directions.splice(index, 1);
+        directions.push(currentDirection);
+        console.log(currentDirection);
+      }
+    }
+    return directions;
+  };
+
+  // eslint-disable-next-line no-shadow
+  const attack = (enemyGameboard, lastHitCoordinate, currentDirection) => {
     const gridSize = enemyGameboard.getGrid().length;
     const validCoordinates = FactoryHelpers.getAllValidCoordinates(gridSize);
 
     let coordinate = "";
 
-    // Perform a do-while loop until a unique coordinate is found
-    do {
-      // Generate a random index based on the length of validCoordinates array
-      const randomIndex = Math.floor(Math.random() * validCoordinates.length);
+    console.log(`lastHitCoordinate: ${lastHitCoordinate}`);
+    console.log(`currentDirection: ${currentDirection}`);
 
-      // Get the coordinate at the random index
+    if (lastHitCoordinate && currentDirection) {
+      // Get the next directions to try
+      const directionsToTry = getNextDirections();
+
+      // Try each direction until a valid coordinate is found
+      // eslint-disable-next-line no-restricted-syntax
+      for (const direction of directionsToTry) {
+        coordinate = getNextCoordinateInDirection(lastHitCoordinate, direction);
+        // Check if the next coordinate in the current direction is a valid, unattacked coordinate
+        if (
+          validCoordinates.includes(coordinate) &&
+          !attackedCoordinates.has(coordinate) &&
+          !enemyGameboard.getAttackedCoordinates().includes(coordinate)
+        ) {
+          // Add the attacked coordinate to the player's set of attacked coordinates
+          attackedCoordinates.add(coordinate);
+          // Update lastHitCoordinate and currentDirection
+          // eslint-disable-next-line no-param-reassign
+          lastHitCoordinate = coordinate;
+          // eslint-disable-next-line no-param-reassign
+          currentDirection = direction;
+          return coordinate;
+        }
+      }
+    }
+
+    // If no valid next coordinate in the current direction, or if the lastHitCoordinate or currentDirection is not set,
+    // attack randomly like before
+    do {
+      const randomIndex = Math.floor(Math.random() * validCoordinates.length);
       coordinate = validCoordinates[randomIndex];
     } while (
-      // Continue looping without performing any actions if the coordinate is already
-      // in the players attackedCoordinates set or is included in the enemyGameboards
-      // attackedCoordinates array
       attackedCoordinates.has(coordinate) ||
       enemyGameboard.getAttackedCoordinates().includes(coordinate)
     );
 
-    // Add the attacked coordinate to the players set of attacked coordinates
+    // Add the attacked coordinate to the player's set of attacked coordinates
     attackedCoordinates.add(coordinate);
 
-    return coordinate; // Return the coordinate as an array
+    return coordinate;
   };
 
   const getAttackedSet = () => attackedCoordinates;
 
   const clearSet = () => {
     attackedCoordinates.clear();
+    // lastHitCoordinate = null;
+    // currentDirection = null;
   };
 
   return {
     name,
+    lastHitCoordinate,
+    currentDirection,
     attack,
     getAttackedSet,
     clearSet,

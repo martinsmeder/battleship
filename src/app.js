@@ -183,8 +183,11 @@ const Controller = (() => {
 
   const computerAttack = () => {
     if (!shipPlacementMode) {
-      // Perform a computer attack and get the coordinate
-      const coordinate = computer.attack(playerGameboard);
+      const coordinate = computer.attack(
+        playerGameboard,
+        computer.lastHitCoordinate,
+        computer.currentDirection
+      );
       // Receive the attack on the player's gameboard and get the attacked ship (if any)
       const attackedShip = playerGameboard.receiveAttack(coordinate);
 
@@ -196,10 +199,20 @@ const Controller = (() => {
 
       if (attackedShip) {
         square.classList.add("hit");
-      } else {
+        // If there was a hit, update the lastHitCoordinate and currentDirection
+        computer.lastHitCoordinate = coordinate;
+        // To keep the computer's attack consistent, set the currentDirection initially to "up"
+        if (computer.currentDirection === null) {
+          computer.currentDirection = "up";
+        }
+      } else if (!attackedShip && computer.lastHitCoordinate) {
         square.classList.add("miss");
+      } else if (!attackedShip && !computer.lastHitCoordinate) {
+        square.classList.add("miss");
+        // If there was a miss, reset the lastHitCoordinate and currentDirection
+        computer.lastHitCoordinate = null;
+        computer.currentDirection = null;
       }
-
       if (playerGameboard.allShipsSunk()) {
         winner = "The computer";
         Renderer.setWinnerHeading(winner);
@@ -218,7 +231,6 @@ const Controller = (() => {
       const coordinate = square.dataset.coordinate;
       // Convert the row and column indices to an alphanumeric coordinate
 
-      console.log(`playerAttack() at: ${coordinate}`);
       // Check if the coordinate has not been previously attacked
       if (!computerGameboard.getAttackedCoordinates().includes(coordinate)) {
         // Receive the attack on the computer's gameboard and get the attacked ship (if any)
