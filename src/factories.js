@@ -263,8 +263,6 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
 
     let coordinate = "";
 
-    console.log(`${currentDirection} : ${lastHitCoordinate}`);
-
     if (lastHitCoordinate && currentDirection) {
       // Get the next directions to try
       const directionsToTry = getNextDirections();

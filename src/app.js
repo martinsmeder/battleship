@@ -57,21 +57,6 @@ const Controller = (() => {
           placed = computerGameboard.placeShip(ship, coordinates);
         }
       }
-
-      // Get the ship coordinates
-      const coordinate = computerGameboard.getShipCoordinates(ship);
-
-      // Loop through them and add a placed class
-      for (const [row, col] of coordinate) {
-        const convertedCoordinate = FactoryHelpers.convertToAlphanumeric([
-          row,
-          col,
-        ]);
-        const placedSquare = document.querySelector(
-          `.gameboard.computer [data-coordinate="${convertedCoordinate}"]`
-        );
-        placedSquare.classList.add("placed");
-      }
     }
   };
 
