@@ -4,9 +4,18 @@
     padding: 0px;
 }
 
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #container {
     font-family: 'Play', sans-serif;
-    height: 100vh;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,6 +53,26 @@ footer a:hover {
 
 footer a:nth-child(2) {
     font-size: 1.2rem;
+}
+
+button {
+    font-family: 'Play', sans-serif;
+    background-color: #000;
+    font-size: 1.1rem;
+    border: 2px solid #FFF;
+    color: #FFF;
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+    transition: all .07s ease;
+}
+
+button:hover {
+    box-shadow: 0 0 .5rem #757575;
+}
+
+button:active {
+    transform: scale(1.1);
 }
 
 .overlay {
@@ -102,6 +131,30 @@ footer a:nth-child(2) {
     background-color: #ff4f4f;
 }
 
+.gameboard.computer .square.miss {
+    cursor: default;
+}
+
+.gameboard.computer .square.hit {
+    cursor: default;
+}
+
+.gameboard.computer .square {
+    cursor: pointer;
+}
+
+.gameboard.computer .square:hover {
+    background-color: #cccccc;
+}
+
+.gameboard.computer .square.hit:hover {
+    background-color: #ff4f4f;
+}
+
+.ship-type {
+    text-decoration: underline;
+}
+
 #gameboardContainer {
     display: flex;
     gap: 50px;
@@ -117,4 +170,86 @@ footer a:nth-child(2) {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* ======================================== MEDIA QUERIES ================================= */
+
+@media (max-width: 700px) {
+    * {
+        overflow: hidden;
+    }
+
+    #gameboardContainer {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 550px) {
+    #gameboardContainer {
+        transform: scale(0.6);
+    }
+
+    header {
+        font-size: 1.5rem;
+    }
+
+    footer {
+        padding: 5px;
+        gap: 0px;
+    }
+
+    footer a {
+        transform: scale(0.7);
+        padding: 0px;
+    }
+}
+
+@media (max-width: 400px) {
+    header {
+        padding-bottom: 10px;
+    }
+
+    main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #gameboardContainer {
+        flex-direction: column;
+    }
+
+    .modal {
+        transform: scale(0.7);
+        text-align: center;
+    }
+
+    .gameboard.initial {
+        transform: scale(0.9);
+    }
+}
+
+@media (max-width: 300px) {
+    header {
+        font-size: 1rem;
+    }
+
+    footer a {
+        transform: scale(0.5);
+        width: 300px;
+        height: 30px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 5px;
+    }
+
+    #gameboardContainer {
+        flex-direction: column;
+    }
+
+    .gameboard.initial {
+        transform: scale(0.7);
+    }
 }
