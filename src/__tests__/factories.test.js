@@ -97,14 +97,16 @@ describe("GameboardFactory", () => {
     // Incoming command - Assert the direct public side effect
     const ship = ShipFactory(3);
     const coordinates = [
-      [2, 1],
-      [2, 2],
-      [2, 3],
+      [5, 5],
+      [5, 6],
+      [5, 7],
     ];
 
     gameboard.placeShip(ship, coordinates);
 
-    gameboard.receiveAttack("C3");
+    const alphanumericCoordinate = FactoryHelpers.convertToAlphanumeric([5, 5]);
+
+    gameboard.receiveAttack(alphanumericCoordinate);
 
     expect(ship.hits).toBe(1);
   });

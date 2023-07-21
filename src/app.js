@@ -7,8 +7,7 @@ import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 // 1. ---
 // 2. ---
 // 3. ---
-// 4. Make the computer try adjacent locations if getting a hit
-// 4. Style => Modals
+// 4. Style => Modals => Media queries
 // 5. Push to gh-pages and add readme
 
 const Controller = (() => {
@@ -191,8 +190,6 @@ const Controller = (() => {
       // Receive the attack on the player's gameboard and get the attacked ship (if any)
       const attackedShip = playerGameboard.receiveAttack(coordinate);
 
-      console.log(`computerAttack() at: ${coordinate}`);
-
       const square = document.querySelector(
         `.gameboard.player [data-coordinate="${coordinate}"]`
       ); // Get the corresponding square element on the player's gameboard
@@ -272,6 +269,8 @@ const Controller = (() => {
     shipPlacementMode = true;
     isVertical = false;
     winner = null;
+    computer.lastHitCoordinate = null;
+    computer.currentDirection = null;
 
     // Reset gameboard objects
     playerGameboard.reset();

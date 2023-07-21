@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { FactoryHelpers } from "./utils";
 
 export const ShipFactory = (length) => {
@@ -209,13 +210,12 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
   const attackedCoordinates = new Set(); // Set to keep track of attacked coordinates
 
   const getNextCoordinateInDirection = (coordinate, direction) => {
-    const [colLetter, rowNumber] = coordinate;
-    const row = parseInt(rowNumber, 10);
-    const col = colLetter.charCodeAt(0) - 65;
+    const [row, col] = FactoryHelpers.convertToIndices(coordinate);
 
     let nextRow = row;
     let nextCol = col;
 
+    // Update the nextRow and nextCol based on the given direction
     switch (direction) {
       case "up":
         nextRow -= 1;
@@ -263,8 +263,7 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
 
     let coordinate = "";
 
-    console.log(`lastHitCoordinate: ${lastHitCoordinate}`);
-    console.log(`currentDirection: ${currentDirection}`);
+    console.log(`${currentDirection} : ${lastHitCoordinate}`);
 
     if (lastHitCoordinate && currentDirection) {
       // Get the next directions to try
@@ -283,9 +282,8 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
           // Add the attacked coordinate to the player's set of attacked coordinates
           attackedCoordinates.add(coordinate);
           // Update lastHitCoordinate and currentDirection
-          // eslint-disable-next-line no-param-reassign
+
           lastHitCoordinate = coordinate;
-          // eslint-disable-next-line no-param-reassign
           currentDirection = direction;
           return coordinate;
         }
@@ -312,8 +310,6 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
 
   const clearSet = () => {
     attackedCoordinates.clear();
-    // lastHitCoordinate = null;
-    // currentDirection = null;
   };
 
   return {
