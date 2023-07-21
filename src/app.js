@@ -4,12 +4,6 @@ import { AppHelpers, FactoryHelpers } from "./utils";
 import Renderer from "./render";
 import { ShipFactory, GameboardFactory, PlayerFactory } from "./factories";
 
-// 1. ---
-// 2. ---
-// 3. ---
-// 4. Style => Modals => Media queries
-// 5. Push to gh-pages and add readme
-
 const Controller = (() => {
   const playerGameboard = GameboardFactory();
   const computerGameboard = GameboardFactory();

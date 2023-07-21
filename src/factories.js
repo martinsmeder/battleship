@@ -236,26 +236,6 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
     return FactoryHelpers.convertToAlphanumeric([nextRow, nextCol]);
   };
 
-  const getNextDirections = () => {
-    const directions = ["up", "down", "left", "right"];
-    if (!currentDirection) {
-      // If currentDirection is not set, shuffle the directions to try them in random order
-      for (let i = directions.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [directions[i], directions[j]] = [directions[j], directions[i]];
-      }
-    } else {
-      // If currentDirection is set, move it to the end of the list, so it will try other directions first
-      const index = directions.indexOf(currentDirection);
-      if (index !== -1) {
-        directions.splice(index, 1);
-        directions.push(currentDirection);
-        console.log(currentDirection);
-      }
-    }
-    return directions;
-  };
-
   // eslint-disable-next-line no-shadow
   const attack = (enemyGameboard, lastHitCoordinate, currentDirection) => {
     const gridSize = enemyGameboard.getGrid().length;
@@ -265,7 +245,7 @@ export const PlayerFactory = (name, currentDirection, lastHitCoordinate) => {
 
     if (lastHitCoordinate && currentDirection) {
       // Get the next directions to try
-      const directionsToTry = getNextDirections();
+      const directionsToTry = ["up", "down", "left", "right"];
 
       // Try each direction until a valid coordinate is found
       // eslint-disable-next-line no-restricted-syntax
