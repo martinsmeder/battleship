@@ -4,12 +4,4 @@
 
 Live demo: https://martinsmeder.github.io/battleship/
 
-A browser based game of battleship!
-
-Some things I've learned:
-
-- How to write unit tests
-- How to write testable code
-- What's important to test, and what's not important
-- How to work with multiple factory functions
-- How to attach multiple eventListeners to the same div with a single method
+Engage in a classic game of Battleship right in your browser, pitting your wits against the computer opponent. The computer AI operates with a touch of strategy beyond random moves, offering an exciting challenge while still providing you with a fair chance to outmaneuver it!
