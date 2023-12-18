@@ -4,4 +4,6 @@
 
 Live demo: https://martinsmeder.github.io/battleship/
 
-Engage in a classic game of Battleship right in your browser, pitting your wits against the computer opponent. The computer AI operates with a touch of strategy beyond random moves, offering an exciting challenge while still providing you with a fair chance to outmaneuver it!
+Engage in a classic game of Battleship right in your browser, pitting your wits against the computer opponent. 
+
+The computer AI operates with a touch of strategy beyond random moves, offering an exciting challenge while still providing you with a fair chance to outmaneuver it!
